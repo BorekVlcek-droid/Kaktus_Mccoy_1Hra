@@ -17,7 +17,7 @@ code += 'const PRA=' + rd('data/pr.json') + ';\n'
 code += ''.join(rd(f) + '\n' for f in ['pirate.js', 'pirintro.js', 'shipjump.js', 'smooth.js', 'menu3.js', 'quests.js', 'map2.js', 'cls3.js', 'rewards.js', 'qmenu.js'])
 code += 'const E2A={};\n' + rd('enemies2.js') + '\n'
 code += 'const E3A=' + rd('data/en3.json') + ';\n' + rd('enemies3.js') + '\n'
-code += rd('hudbar.js') + '\nwindow.__HAS=HAS;\n'
+code += rd('hudbar.js') + '\n' + rd('cine2.js') + '\nwindow.__HAS=HAS;\n'
 
 anchor = '/* ===== v60: džungle vyřazena'
 assert base.count(anchor) == 1
