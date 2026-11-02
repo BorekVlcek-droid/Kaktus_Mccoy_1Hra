@@ -4419,7 +4419,7 @@ POST.adm={dur:300,
 function adRopes(x,z,n){const sx=x-cam,sy=LY-z;X.save();X.lineCap='round';for(let i=0;i<n;i++){const y=sy-50-i*20;X.strokeStyle='#5a4020';X.lineWidth=6;X.beginPath();X.ellipse(sx-2,y,30,6,0,0,Math.PI);X.stroke();X.strokeStyle='#c8a060';X.lineWidth=3.4;X.stroke()}if(n>=5){X.strokeStyle='#c8a060';X.lineWidth=3;X.beginPath();X.moveTo(sx+26,sy-60);X.quadraticCurveTo(sx+40,sy-40,sx+34,sy-20);X.stroke()}X.restore()}
 /* přivázaný admirál zůstane na stěžni (i při doplutí) */
 const ADQ={B:'adm',t:'x',x:0,z:0,gf:0,face:-1,st:'boss',bst:'idle',tm:60,t2:0,hs:0,dt:0,hp:100,mhp:100,_fig:1,gd:0,fl:0,lost:{hat:1,w:1},vul:0};
-{const _dp=dSnPerch;dSnPerch=function(){_dp();if(ADT&&lv.k=='sea'&&!(cut&&cut.k=='bpost')){ADQ.x=ADT.x;ADQ.z=0;ADQ.t2=T;ADQ.bst=T%120<20?'tired':'idle';qDraw(ADQ,{tint:'rgba(20,16,14,.62)',w:420,h:460});adRopes(ADT.x,0,5);if(T%14==0)par.push({x:ADT.x+R(-8,12),y:LY,z:150,fz:-999,vx:R(-.3,.3),vz:1,l:40,c:'rgba(90,90,90,.5)',s:R(4,7)})}}}
+{const _dp=dSnPerch;dSnPerch=function(){_dp();if(ADT&&lv.k=='sea'&&!(cut&&cut.k=='bpost')){ADQ.x=ADT.x;ADQ.z=0;ADQ.t2=T;ADQ.bst=T%120<20?'tired':'idle';qDraw(ADQ,{tint:ADT.soot===0?null:'rgba(20,16,14,.62)',w:420,h:460});adRopes(ADT.x,0,5);if(ADT.soot!==0&&T%14==0)par.push({x:ADT.x+R(-8,12),y:LY,z:150,fz:-999,vx:R(-.3,.3),vz:1,l:40,c:'rgba(90,90,90,.5)',s:R(4,7)})}}}
 {const _st=start;start=function(i,arr){if(i!=1&&i!=2)ADT=null;if(i==1)ADT=null;return _st(i,arr)}}
 /* ---------- 3) La Sombra → obří anakonda ---------- */
 function anaco(x0,z0,t,o){const r=o.r,hx=o.hx,hz=o.hz;if(r<=.01)return;const gy=LY-z0;X.save();X.beginPath();X.rect(-200,-400,W+400,gy+4+400);X.clip();
@@ -4503,9 +4503,9 @@ function swDraw(t,mv){const x0=SWX!=null?SWX:SWF,x=x0-cam;if(x>W+60||x+(JSL+270)
  X.save();X.beginPath();X.rect(-50,-400,W+100,GY-4+400);X.rect(-50,GY-8,190-cam+50,H);X.clip('nonzero');
  jsShip(x,yd,SWS,T,{night:1,smoke:mv>.05||t==null?1:0,steam:t!=null&&t>14&&t<60?1-Math.abs(t-34)/26:0,lamp:1});
  /* přivázaný, očazený admirál na předním stěžni */
- ADQ.x=x0+SWM;ADQ.z=LY-yd;ADQ.t2=T;ADQ.bst=T%140<24?'tired':'idle';ADQ.face=1;qDraw(ADQ,{tint:'rgba(20,16,14,.62)',w:420,h:460,s:.62,cy:0});
+ ADQ.x=x0+SWM;ADQ.z=LY-yd;ADQ.t2=T;ADQ.bst=T%140<24?'tired':'idle';ADQ.face=1;qDraw(ADQ,{tint:ADT&&ADT.soot===0?null:'rgba(20,16,14,.62)',w:420,h:460,s:.62,cy:0});
  X.save();const ax=ADQ.x-cam,ay=yd;X.translate(ax,ay);X.scale(.62,.62);X.translate(-ax,-ay);adRopes(ADQ.x,ADQ.z,5);X.restore();
- if(T%16==0)par.push({x:ADQ.x+R(-8,12),y:LY,z:ADQ.z+140,fz:-999,vx:R(-.3,.3),vz:1,l:40,c:'rgba(90,90,90,.5)',s:R(4,7)});
+ if(!(ADT&&ADT.soot===0)&&T%16==0)par.push({x:ADQ.x+R(-8,12),y:LY,z:ADQ.z+140,fz:-999,vx:R(-.3,.3),vz:1,l:40,c:'rgba(90,90,90,.5)',s:R(4,7)});
  /* kotevní řetěz */
  if(SWX==null||(cut&&cut.k=='sarr'&&cut.anc)){const k=cut&&cut.k=='sarr'?Math.min(1,(cut.t-cut.anc)/22):1,hx=x+(JSL+60)*SWS,hy=yd+18*SWS;X.strokeStyle='#1a1a1e';X.lineWidth=3;X.setLineDash([4,3]);X.beginPath();X.moveTo(hx,hy);X.quadraticCurveTo(hx+14,hy+40*k,hx+10,hy+(GY+30-hy)*k);X.stroke();X.setLineDash([])}
  X.restore();
