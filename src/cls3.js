@@ -41,7 +41,7 @@ dCls=function(){const C=cs.s,t=cs.t||0;if(T-CS3.lt>3){CS3.t0=T;CS3.p=[0,1,2,3].m
  /* profil vpravo */cs3Card(C,age);
  /* tlačítka */m2Plank(CSBK.x,CSBK.y,CSBK.w,CSBK.h,'◀ ZPĚT',CS3.hv&&CS3.hv.k=='back');
  const pul=.5+.5*Math.sin(T*.1);X.save();X.shadowColor='rgba(120,255,90,'+(.3+.3*pul)+')';X.shadowBlur=14;m2Plank(CSB3.x,CSB3.y,CSB3.w,CSB3.h,cs.mode=='new'?'ZAČÍT HRU ▶':'VYBRAT ▶',CS3.hv&&CS3.hv.k=='ok','g');X.restore();
- if(cs.mode=='new'&&(SV.un>0||SV.st>0)){X.textAlign='right';X.font='italic 12px Georgia';X.fillStyle='#ffb09a';X.fillText('Pozor: nová hra smaže postup (kapitola '+(SV.un+1)+', ★ '+SV.st+')',CSB3.x+CSB3.w,CSB3.y-8)}
+ if(cs.mode=='new'&&(SV.un>0||SV.st>0)){X.textAlign='right';X.font='italic 12px Georgia';X.fillStyle='#ffb09a';X.fillText('Pozor: nová hra smaže postup (kapitola '+(SV.un+1)+', ★ '+pgStars()+', $ '+SV.st+')',CSB3.x+CSB3.w,CSB3.y-8)}
  X.textAlign='left';X.font='12px Georgia';X.fillStyle='rgba(255,236,200,.6)';X.fillText(TOUCH?'Klepni na postavu':'← → výběr  •  Enter potvrdit  •  Esc zpět',150,36);
  if(age<14){X.fillStyle='rgba(0,0,0,'+(1-age/14)+')';X.fillRect(0,0,W,H)}
  if(CS3.go>0){X.fillStyle='rgba(255,240,210,'+(CS3.go/16*.5)+')';X.fillRect(0,0,W,H)}}

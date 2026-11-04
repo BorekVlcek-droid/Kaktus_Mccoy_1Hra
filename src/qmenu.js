@@ -6,7 +6,7 @@
 const QM={tab:0,reg:0,cur:0,t:0,pop:null,ret:'menu',hv:null,ft:0};
 const QMT=[{t:'ÚKOLY',x:286,w:136},{t:'ODMĚNY',x:430,w:150},{t:'STATISTIKY',x:588,w:176}];
 function openQM(ret,reg){state='qmenu';QM.t=0;QM.ret=ret||'menu';QM.pop=null;QM.hv=null;QM.reg=Math.max(0,Math.min(LV.length-1,reg==null?SV.un:reg));QM.tab=rwPend().length?1:0;QM.cur=0;const pd=rwPend();if(pd.length)QM.cur=qmItems().findIndex(it=>it.key==pd[0]);if(QM.cur<0)QM.cur=0;sfx('cloth')}
-function closeQM(){sfx('uiok');if(QM.ret=='map'){openMap(MAP.sel)}else{state='menu';mn={s:Math.max(0,MI().indexOf('Úkoly')),sub:0}}}
+function closeQM(){sfx('uiok');if(QM.ret=='map'){openMap(MAP.sel)}else{state='menu';mn={s:Math.max(0,MI().indexOf('Deník')),sub:0}}}
 /* položky karty ODMĚNY (pro kurzor): hodnosti 1..7, talismany 0..8 */
 function qmItems(){const a=[];for(let i=1;i<RANKS.length;i++)a.push({k:'rank',i,key:'r'+i});TAL.forEach((t,i)=>a.push({k:'tal',i,id:t.id,key:talKey(t)}));return a}
 const QMR={x0:70,x1:890,y:178};
@@ -124,6 +124,6 @@ function qmMouse(x,y,c){MX=x;MY=y;if(QM.pop){if(c&&QM.pop.t>20){QM.pop=null;sfx(
 {const _mh=mh;mh=function(e,c){if(state=='qmenu'){const r=C.getBoundingClientRect();qmMouse((e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H,c);return}return _mh(e,c)}}
 {const _tt=tTap;tTap=function(x,y){if(state=='qmenu'){qmMouse(x,y,1);return}return _tt(x,y)}}
 {const _mw=musWantK;musWantK=function(){if(state=='qmenu')return'menu';return _mw()}}
-{const _ac=act;act=function(i){const it=MI()[i];if(state=='menu'&&mn.sub==0&&it=='Úkoly'){sfx('uiok');openQM('menu');return}return _ac(i)}}
-{const _ma=mapAct;mapAct=function(k,i){if(k=='quests'){sfx('uiok');openQM('map',MAP.sel);return}return _ma(k,i)}}
+{const _ac=act;act=function(i){const it=MI()[i];if(state=='menu'&&mn.sub==0&&it=='Deník'){sfx('uiok');openQM('menu');return}return _ac(i)}}
+{const _ma=mapAct;mapAct=function(k,i){if(k=='quests'||k=='ach'){sfx('uiok');openQM('map',MAP.sel,k=='ach'?2:0);return}return _ma(k,i)}}
 addEventListener('keydown',e=>{if(e.code=='Tab'&&(state=='qmenu'||state=='menu'||state=='map'))e.preventDefault()});

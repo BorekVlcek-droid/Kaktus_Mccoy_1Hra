@@ -110,7 +110,7 @@ function m2Node(i,x,y,lock,pop,hov){const big=i==7,r=big?22:18;X.save();X.transl
  const g=X.createRadialGradient(-r*.3,-r*.35,2,0,0,r);g.addColorStop(0,cLt(MPCOL[i],.35));g.addColorStop(1,MPCOL[i]);X.fillStyle=g;X.beginPath();X.arc(0,0,r-2.6,0,7);X.fill();
  if(i<SV.un){X.strokeStyle='#ffd27a';X.lineWidth=2.4;X.beginPath();X.arc(0,0,r+4,0,7);X.stroke();X.strokeStyle='rgba(90,50,10,.6)';X.lineWidth=1;X.beginPath();X.arc(0,0,r+5.6,0,7);X.stroke()}
  X.strokeStyle='rgba(255,240,210,.45)';X.lineWidth=1;X.beginPath();X.arc(0,0,r-5.5,0,7);X.stroke();m2Icon(i,r);
- const n=qCount(i);for(let k=0;k<5;k++){const a=Math.PI/2+(k-2)*.34,sx=Math.cos(a)*(r+10),sy=Math.sin(a)*(r+10);mStar(sx,sy,4.3,k<n)}
+ const mk=pgMask(i);for(let k=0;k<3;k++){const a=Math.PI/2+(k-1)*.5,sx=Math.cos(a)*(r+11),sy=Math.sin(a)*(r+11);pgStarShape(sx,sy,6.5,mk>>k&1)}
  if(SV.qm&&SV.qm[i])qSheriff(r*.8,-r*.8,8.5,.2);
  X.restore()}
 /* ---------- živá vrstva mapy ---------- */
@@ -163,12 +163,7 @@ function m2Panel(i){const x=12,y=58,w=312,h=420,L=LV[i],lk=i>SV.un,b=SV.best&&SV
  if(b){X.font='20px '+FONT;X.lineWidth=3;X.strokeStyle='#2a1406';X.strokeText(b.r,x+198,sy+3);X.fillStyle=RKC[b.r]||'#3a2410';X.fillText(b.r,x+198,sy+3)}
  const sm=seedMask(i);for(let k=0;k<3;k++)seedShape(x+236+k*20,sy-5,.42,sm>>k&1);
  X.fillStyle='#7a5228';X.fillRect(x+12,sy+9,w-24,1.5);
- /* úkoly */const qy=sy+27,n=qCount(i);X.font='16px '+FONT;X.fillStyle='#3a1606';X.fillText('ÚKOLY',x+16,qy);X.font='700 12px Georgia';X.fillStyle=n==5?'#2a7a2a':'#7a4a1e';X.fillText(n+' / 5',x+82,qy);
- X.font='italic 11px Georgia';X.fillStyle='#7a5a3a';X.textAlign='right';X.fillText(SV.qm&&SV.qm[i]?'šerifská hvězda získána':'všech 5 = +'+QMEDAL+' ★',x+w-38,qy);X.textAlign='left';qSheriff(x+w-24,qy-5,10,0,!SV.qm||!SV.qm[i]);
- QD[i].forEach((d,k)=>{const yy=qy+6+k*41,ev=qDoneEver(i,k),K=QK[d[0]];if(k<4){X.fillStyle='rgba(122,82,40,.3)';X.fillRect(x+12,yy+40,w-24,1)}
-  qIco(K.c,x+26,yy+16,10,false);X.font='12px Georgia';X.fillStyle=ev?'#4a6a2a':'#2a1406';const ls=wrapL(qTxt(i,k),w-112);ls.slice(0,2).forEach((l,j)=>X.fillText(l,x+42,yy+14+j*13));
-  if(ev){qCheck(x+w-30,yy+16,1,'#2a8a2a')}else{X.textAlign='right';X.font='700 12px Georgia';X.fillStyle='#8a4a0a';X.fillText('+'+d[2],x+w-32,yy+19);m3Star(x+w-21,yy+15,6,'#e8a020');X.textAlign='left';
-   if(qCountable(d)){const bb=Math.min(d[1],qBest(i,k));if(bb>0){const bw=w-150;X.fillStyle='rgba(60,30,10,.2)';X.fillRect(x+42,yy+32,bw,4);X.fillStyle='#c8801e';X.fillRect(x+42,yy+32,bw*bb/d[1],4);X.font='10px Georgia';X.fillStyle='#7a5a3a';X.fillText('nejlépe '+bb+'/'+d[1],x+48+bw,yy+36)}}}});
+ pgAreaMini(i,x+12,sy+16,w-24,lk);
  X.restore()}
 /* ---------- tlačítka ---------- */
 function m2Plank(x,y,w,h,t,hov,col,dis){X.save();if(hov&&!dis){X.translate(0,-2)}X.fillStyle='rgba(0,0,0,.45)';X.beginPath();X.roundRect(x+3,y+5,w,h,6);X.fill();
@@ -176,13 +171,13 @@ function m2Plank(x,y,w,h,t,hov,col,dis){X.save();if(hov&&!dis){X.translate(0,-2)
  X.save();X.clip();X.strokeStyle='rgba(30,12,4,.35)';X.lineWidth=1;for(let k=0;k<3;k++){const yy=y+6+k*(h-12)/2;X.beginPath();for(let xx=x;xx<=x+w;xx+=16)X.lineTo(xx,yy+Math.sin(xx*.05+k*3)*1.4);X.stroke()}X.fillStyle='rgba(255,240,200,.18)';X.fillRect(x,y,w,3);X.restore();
  X.strokeStyle=hov&&!dis?'#ffe2a0':'#1a0a04';X.lineWidth=hov&&!dis?2.2:2;X.beginPath();X.roundRect(x,y,w,h,6);X.stroke();X.fillStyle='#2a2420';for(const nx of[x+8,x+w-8]){X.beginPath();X.arc(nx,y+h/2,2.3,0,7);X.fill()}
  X.textAlign='center';X.font=(h>36?'19px ':'15px ')+FONT;X.lineWidth=4;X.lineJoin='round';X.strokeStyle='rgba(20,6,2,.85)';X.strokeText(t,x+w/2,y+h/2+(h>36?7:5));X.fillStyle=dis?'#c8c0b0':col=='g'?'#fffbe8':'#f6e4bc';X.fillText(t,x+w/2,y+h/2+(h>36?7:5));X.restore()}
-const MBT2=[{k:'quests',t:'ÚKOLY'},{k:'ach',t:'ÚSPĚCHY'},{k:'skills',t:'SCHOPNOSTI'},{k:'keys',t:'OVLÁDÁNÍ'},{k:'cls',t:'POSTAVA'}];MBT2.forEach((b,i)=>{b.w=114;b.x=338+i*122});
+const MBT2=[{k:'quests',t:'DENÍK'},{k:'ach',t:'ÚSPĚCHY'},{k:'skills',t:'SCHOPNOSTI'},{k:'keys',t:'OVLÁDÁNÍ'},{k:'cls',t:'POSTAVA'}];MBT2.forEach((b,i)=>{b.w=114;b.x=338+i*122});
 function m2Bars(){const h=MAP.hv||{};
  m2Plank(14,10,118,36,'◀ ZPĚT',h.k=='back');mRibbon(640,32,250,'MAPA ZÁPADU',1);
- /* počítadla */X.save();const cx0=142;X.fillStyle='rgba(20,8,4,.55)';X.beginPath();X.roundRect(cx0,12,182,32,16);X.fill();X.strokeStyle='rgba(232,184,96,.5)';X.lineWidth=1.2;X.stroke();m3Star(cx0+18,28,8,'#ffd44a');X.textAlign='left';X.font='700 14px Georgia';X.fillStyle='#ffe6a0';X.fillText(String(SV.st),cx0+30,33);seedShape(cx0+78,29,.42,1);X.fillStyle='#a8ffb0';X.fillText(seedTotal()+'',cx0+90,33);qSheriff(cx0+124,28,9,0);let qa=0;for(let j=0;j<LV.length;j++)qa+=qCount(j);X.fillStyle='#ffd27a';X.fillText(qa+'/'+LV.length*5,cx0+137,33);X.restore();
+ /* počítadla */X.save();const cx0=142;X.fillStyle='rgba(20,8,4,.55)';X.beginPath();X.roundRect(cx0,12,182,32,16);X.fill();X.strokeStyle='rgba(232,184,96,.5)';X.lineWidth=1.2;X.stroke();hbCoin(cx0+18,28,8,T*.05);X.textAlign='left';X.font='700 14px Georgia';X.fillStyle='#ffe6a0';X.fillText(String(SV.st),cx0+30,33);seedShape(cx0+78,29,.42,1);X.fillStyle='#a8ffb0';X.fillText(seedTotal()+'',cx0+90,33);pgStarShape(cx0+124,28,9,1);X.fillStyle='#ffd27a';X.fillText(pgStars()+'/24',cx0+137,33);X.restore();
  X.save();X.translate(W-36,28);X.fillStyle='rgba(0,0,0,.5)';X.beginPath();X.arc(1,3,17,0,7);X.fill();const sg=X.createLinearGradient(0,-17,0,17);sg.addColorStop(0,'#c8925a');sg.addColorStop(1,'#5a3418');X.fillStyle=sg;X.beginPath();X.arc(0,0,17,0,7);X.fill();X.strokeStyle=h.k=='snd'?'#ffe2a0':'#1a0a04';X.lineWidth=2;X.stroke();X.fillStyle='#f6e4bc';X.beginPath();X.moveTo(-8,-4);X.lineTo(-3,-4);X.lineTo(2,-9);X.lineTo(2,9);X.lineTo(-3,4);X.lineTo(-8,4);X.closePath();X.fill();
  if(SV.sfx){X.strokeStyle='#f6e4bc';X.lineWidth=1.8;X.beginPath();X.arc(3,0,5.5,-.8,.8);X.stroke();X.beginPath();X.arc(3,0,10,-.8,.8);X.stroke()}else{X.strokeStyle='#ff6a4a';X.lineWidth=2.4;X.beginPath();X.moveTo(6,-5);X.lineTo(13,5);X.moveTo(13,-5);X.lineTo(6,5);X.stroke()}X.restore();
- MBT2.forEach(b=>{m2Plank(b.x,H-50,b.w,32,b.t,h.k==b.k);if(b.k=='quests'){const pd=rwPend().length;if(pd){const pu=1+.12*Math.sin(T*.25);X.save();X.translate(b.x+b.w-6,H-50);X.scale(pu,pu);X.fillStyle='#c8241a';X.beginPath();X.arc(0,0,10,0,7);X.fill();X.strokeStyle='#fff3dc';X.lineWidth=1.5;X.stroke();X.font='700 12px Georgia';X.textAlign='center';X.fillStyle='#fff';X.fillText(String(pd),0,4.5);X.restore()}}});
+ MBT2.forEach(b=>{m2Plank(b.x,H-50,b.w,32,b.t,h.k==b.k);if(b.k=='quests'){const pd=PG.nw;if(pd){const pu=1+.12*Math.sin(T*.25);X.save();X.translate(b.x+b.w-6,H-50);X.scale(pu,pu);X.fillStyle='#c8241a';X.beginPath();X.arc(0,0,10,0,7);X.fill();X.strokeStyle='#fff3dc';X.lineWidth=1.5;X.stroke();X.font='700 12px Georgia';X.textAlign='center';X.fillStyle='#fff';X.fillText(String(pd),0,4.5);X.restore()}}});
  const lk=MAP.sel>SV.un;m2Plank(M2PB.x,M2PB.y,M2PB.w,M2PB.h,lk?'ZAMČENO':'HRÁT ▶',h.k=='play',lk?'g':'g',lk);
  X.save();X.textAlign='left';X.font='12px Georgia';X.fillStyle='rgba(255,236,200,.55)';X.fillText(TOUCH?'Klepni na oblast a pak na HRÁT':'←→ oblast  •  Enter hrát  •  Esc zpět',16,H-24);X.restore()}
 mapHit=function(x,y){if(x>14&&x<132&&y>10&&y<46)return{k:'back'};if(Math.hypot(x-(W-36),y-28)<19)return{k:'snd'};for(const b of MBT2){if(x>b.x&&x<b.x+b.w&&y>H-50&&y<H-18)return b}
