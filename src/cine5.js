@@ -283,7 +283,7 @@ BPS.jef={dur:560,c5:1,
   if(t<90&&t%30==0)synth(t2=>{taOsc('triangle',523,t2,.18,.12,{f2:523});taOsc('triangle',659,t2+.18,.18,.12);taOsc('triangle',784,t2+.36,.4,.12)});
   if(t<200){q.x=tiL(c.bx+s*520,c.bx,tiE.o(tiS(t,60,200)));q.vx=t>=60?-s*2.4:0;bpPose(q,'idle',60);c5Shot(c,t<60?(p.x+c.bx)/2:(q.x+p.x)/2,c.bz+150,t<60?1.05:1.2,.05,t==1);if(t>=96&&t<200&&t%22==0)pop(cam+R(80,W-80),LY,LY-GY+170,'¡JEFE! ¡JEFE!','#ffcf8a');if(t==40)c5Say('','(fanfáry, reflektory, dupot bot)')}
   if(t>=200){q.x=c.bx;q.vx=0}
-  if(t>=200&&t<280){bpPose(q,'call',30);c5Shot(c,q.x-s*30,c.bz+160,1.45,.06);if(t==206){c5Say('EL JEFE','Ancla. Tiburón. La Sombra. Dinamitero. A můj mazlíček štír.');sfx('vJef',q.x)}}
+  if(t>=200&&t<280){bpPose(q,'call',30);c5Shot(c,q.x-s*30,c.bz+160,1.45,.06);if(t==206){c5Say('EL JEFE','Ancla. Calavera. La Sombra. Dinamitero. A můj mazlíček štír.');sfx('vJef',q.x)}}
   if(t>=280&&t<360){bpPose(q,'idle',30);c.scr=Math.min(150,(t-280)*3);c5Shot(c,q.x-s*50,c.bz+120,1.45,.06);if(t==286)c5Say('EL JEFE','Celý seznam je škrtnutý. Zbýváš jen ty, kaktusi.')}
   if(t>=360&&t<430){c5Shot(c,p.x+s*40,p.z+100,1.7,.07);if(t==366){c5Say('KAKTUS','Tak si tam připiš ještě jedno jméno. Svoje.');c2Fid(C2COOL[SV.cls])}}
   if(t==430){c.scr=0;c.ball=t;sfx('cloth',q.x)}
