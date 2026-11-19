@@ -15281,15 +15281,15 @@ Object.assign(SFX,{
  pnPeg:{p:[['t',{w:'triangle',f:220,f2:120,d:.07,g:.18}],['n',{d:.04,g:.2,ft:'bandpass',f:1200,f2:600,q:3}]],v:.7,mi:120},
  pnWood:{p:[['n',{d:.3,g:.45,ft:'bandpass',f:700,f2:200,q:1.5}],['t',{f:120,f2:50,d:.25,g:.4}]],rv:.3,mi:200}});
 const PN={on:0,t:0,ev:0,boats:[],balls:[],shots:[],par:null,cd:{},hint:0,ann:null,seed:1,capB:null,last:0,cpOK:0,vd:0};
-const PNTL=[[150,'warn'],[300,'boat',2],[1500,'vol',3],[1980,'boat',3],[3200,'boat',3,0,1],[3260,'boat',2],[4400,'vol',5],[4800,'boat',3,1],[6000,'vol',4],[6100,'boat',3],[7300,'boat',3,0,1],[7360,'boat',3,1],[8700,'vol',6],[9400,'cap']];
+const PNTL=[[120,'warn'],[200,'boat',3],[700,'boat',2],[1200,'vol',3],[1400,'boat',3],[1800,'boat',3,0,1],[1860,'boat',2,0,1],[2500,'vol',4],[2700,'boat',3,1],[3100,'boat',3],[3150,'boat',2,0,1],[3700,'vol',5],[3900,'boat',4],[4300,'boat',3,1,1],[4360,'boat',3,0,1],[5000,'vol',5],[5200,'boat',4,1],[5600,'boat',3],[5650,'boat',3,0,1],[6300,'vol',6],[6800,'cap']];
 const PNZ=[[540,860],[1200,1430],[1705,1820]];
 function pnOn(){return!!(SEA&&lv&&lv.k=='sea'&&!TR2)}
 function pnShipPos(){return{x:700-cam*.32+Math.sin(T*.004)*24,y:GY+50+Math.sin(T*.03)*2.4}}
 function pnFreeX(){const nz=PNZ.filter(z=>z[1]>p.x-520&&z[0]<p.x+520);for(let k=0;k<20;k++){const L=nz.length&&k<12?nz:PNZ,Z=L[(Math.random()*L.length)|0],x=Math.round(R(Z[0],Z[1]));if(!PN.boats.some(b=>!b.gone&&Math.abs(b.tx-x)<160)&&Math.abs(x-p.x)>90)return x}return 700}
-function pnLaunch(n,el,o){o=o||{};const i=PN.boats.filter(b=>b.st=='lower').length?1-(PN.last%2):PN.last%2;PN.last++;const b={st:'lower',t:0,i,n,el:el||0,tx:o.tx||pnFreeX(),u:0,seed:(PN.seed++)%4,cap:o.cap||0,boss:o.boss||0,row:1,sp:o.cap?1/520:1/(SV.dif==2?380:430),hooks:0,cl:0};PNS.hang[i]=0;PN.boats.push(b);
+function pnLaunch(n,el,o){o=o||{};const i=PN.boats.filter(b=>b.st=='lower').length?1-(PN.last%2):PN.last%2;PN.last++;const b={st:'lower',t:0,i,n,el:el||0,tx:o.tx||pnFreeX(),u:0,seed:(PN.seed++)%4,cap:o.cap||0,boss:o.boss||0,row:1,sp:o.cap?1/300:1/([240,200,165][SV.dif]||200),hooks:0,cl:0};PNS.hang[i]=0;PN.boats.push(b);
  sfx('pnWood');if(!o.cap&&!o.quiet)pnAnn(n>=3?'Z Vdovy spouštějí člun – '+n+' piráti!':'Z Vdovy spouštějí člun!');return b}
 function pnAnn(t){PN.ann={t:0,tx:t}}
-function pnBoatPos(b){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0;if(b.st=='lower'){const k=pkE.io(Math.min(1,b.t/56));return{x:lx,y:S.y-112*s0*(1-k)+2,s:.5*s0,rot:0}}
+function pnBoatPos(b){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0;if(b.st=='lower'){const k=pkE.io(Math.min(1,b.t/32));return{x:lx,y:S.y-112*s0*(1-k)+2,s:.5*s0,rot:0}}
  const u=pkE.io(pkC(b.u,0,1)),ax=b.tx-cam,ay=LY-37+camZ*.55;return{x:pkL(lx,ax,u),y:pkL(S.y+2,ay,Math.pow(u,1.25))+Math.sin(T*.05+b.seed)*1.5,s:pkL(.42,.95,u),rot:b.st=='sink'?Math.min(.5,b.t*.01):0}}
 function pnBoatDraw(b){const q=pnBoatPos(b);if(b.st=='lower'){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0,ty=S.y-168*s0;X.strokeStyle='rgba(30,24,18,.9)';X.lineWidth=1;X.beginPath();X.moveTo(lx-8*s0,ty);X.lineTo(q.x-14*q.s,q.y-20*q.s);X.moveTo(lx+8*s0,ty);X.lineTo(q.x+14*q.s,q.y-20*q.s);X.stroke()}
  X.save();X.translate(q.x,q.y);if(b.st=='sink'){X.rotate(q.rot);X.translate(0,b.t*.5*q.s)}
@@ -15300,18 +15300,18 @@ function pnBoatDraw(b){const q=pnBoatPos(b);if(b.st=='lower'){const S=pnShipPos(
  X.restore();X.fillStyle='rgba(255,255,255,'+(.4*cl)+')';X.beginPath();X.ellipse(0,6*q.s,76*q.s,4*q.s,0,0,7);X.fill();X.restore();
  /* lana s háky k našemu zábradlí */if(b.hooks>0&&b.st=='dock'){const rx=b.tx-cam;for(let k=-1;k<=1;k+=2){const hx=rx+k*22,hy=LY-34+camZ*.55,k2=Math.min(1,b.hooks/14),x0=q.x+k*20*q.s,y0=q.y-16*q.s;X.strokeStyle='#5a4020';X.lineWidth=2;X.beginPath();X.moveTo(x0,y0);X.lineTo(pkL(x0,hx,k2),pkL(y0,hy,k2)-Math.sin(k2*Math.PI)*30);X.stroke()}}}
 function pnUpdBoats(){for(const b of PN.boats){b.t++;
- if(b.st=='lower'){if(b.t==56){b.st='row';b.t=0;sfx('splash',b.tx);PNS.hang[b.i]=1}continue}
+ if(b.st=='lower'){if(b.t==32){b.st='row';b.t=0;sfx('splash',b.tx);PNS.hang[b.i]=1}continue}
  if(b.st=='row'){b.u+=b.sp*(PN.vd>0?.5:1);if(b.u>=1){b.u=1;b.st='dock';b.t=0;sfx('heavy',b.tx);shake=Math.max(shake,3)}continue}
  if(b.st=='dock'){if(b.t<16){b.hooks=b.t;if(b.t==6)sfx('pnHook',b.tx)}
   if(b.cap){if(b.t==20&&!b.spawned){b.spawned=1;b.capOn=0;pnCapArrive(b)}if(b.t>200){b.st='away';b.t=0}continue}
-  if(b.t>=26&&(b.t-26)%34==0&&b.cl<b.n){pnClimbE(b,b.cl);b.cl++}if(b.cl>=b.n&&b.t>26+b.n*34+50){b.st='away';b.t=0}continue}
+  if(b.t>=14&&(b.t-14)%20==0&&b.cl<b.n){pnClimbE(b,b.cl);b.cl++}if(b.cl>=b.n&&b.t>14+b.n*20+50){b.st='away';b.t=0}continue}
  if(b.st=='away'){b.u-=1/500;if(b.t>220)b.gone=1;continue}
  if(b.st=='sink'){if(b.t%6==0)spawnP(b.tx,LY,3,'#cfe8f0',2,10,-20);if(b.t>70)b.gone=1}}
  PN.boats=PN.boats.filter(b=>!b.gone)}
 function pnClimbE(b,k){const e=seaE(b.tx+(k%2?1:-1)*R(10,46));e.st='pnClimb';e.z=-80;e.gf=0;e.cl=0;e.face=Math.sign(p.x-e.x)||1;e.pnB=b;
  if(b.el&&k==0&&typeof bjElite=='function')bjElite(e,bjPickEl(e));if(Math.random()<.4)pop(e.x,LY,40,['¡AL ABORDAJE!','¡ARRIBA!','¡VAMOS!','Harr!'][(Math.random()*4)|0],'#ffb14a')}
 /* piráti šplhají přes zábradlí (vidět jen nad ním) */
-{const _u=updE;updE=function(e){if(e&&e.st=='pnClimb'){e.cl++;e.z=-80+76*pkE.o(Math.min(1,e.cl/38));e.face=Math.sign(p.x-e.x)||e.face;if(e.cl>=38){e.st='jumpin';e.z=4;e.vz=6.5;spawnP(e.x,LY,5,'#d8c8a0',2,6,0)}return}return _u(e)}}
+{const _u=updE;updE=function(e){if(e&&e.st=='pnClimb'){e.cl++;e.z=-80+76*pkE.o(Math.min(1,e.cl/26));e.face=Math.sign(p.x-e.x)||e.face;if(e.cl>=26){e.st='jumpin';e.z=4;e.vz=6.5;spawnP(e.x,LY,5,'#d8c8a0',2,6,0)}return}return _u(e)}}
 {const _f=fxE;fxE=function(e){if(e&&e.st=='pnClimb'){X.save();X.beginPath();X.rect(-200,-2000,W+400,LY-26+2000);X.clip();try{_f(e)}finally{X.restore()}
   const x=e.x-cam;X.save();X.strokeStyle='#5a4020';X.lineWidth=2;X.beginPath();X.moveTo(x-6,LY-30);X.lineTo(x-6,LY-26);X.stroke();X.fillStyle='#2a2a2e';X.beginPath();X.arc(x-6,LY-31,3,0,7);X.fill();X.restore();return}return _f(e)}}
 /* shozen do moře během šplhání */
@@ -15353,14 +15353,14 @@ function pnNext(){return PNTL[PN.ev]||null}
 function pnDirector(){if(state!='play'||PN.cap)return;const nx=pnNext();if(!nx)return;
  const live=pnLive(),pend=pnPending(),busy=live+pend*2;
  let rate=1;if(live==0&&pend==0&&nx[0]-PN.t>240&&nx[1]!='vol')rate=4;
- if((nx[1]=='boat'||nx[1]=='cap')&&PN.t>=nx[0]-1&&(busy>=6||(nx[1]=='cap'&&(live>0||pend>0))))rate=0;
+ if((nx[1]=='boat'||nx[1]=='cap')&&PN.t>=nx[0]-1&&(busy>=9||(nx[1]=='cap'&&(live>0||pend>0))))rate=0;
  PN.t+=rate;
  while(PNTL[PN.ev]&&PN.t>=PNTL[PN.ev][0]){const E=PNTL[PN.ev];PN.ev++;
   if(E[1]=='warn'){PNS.fl[3]=9;sfx('cannon');PN.balls.push({x:-999,z:0,t:0,T:60,i:3,miss:1});pnAnn('Na obzoru je Černá vdova – loď Kapitána Calavery!')}
   else if(E[1]=='boat')pnLaunch(E[2],E[3],{quiet:E[4]});
   else if(E[1]=='vol')pnVolley(E[2]+(SV.dif==2?1:0));
   else if(E[1]=='cap'){PN.cap=1;PN.capB=pnLaunch(0,0,{cap:1,tx:pnCapX()});pnAnn('Kapitán Calavera spouští svůj člun!');sfx('bosun')}}
- /* kontrolní bod uprostřed útoku */if(!PN.cpOK&&PN.ev>=8&&live==0&&pend==0&&!(CP&&CP.sea)){PN.cpOK=1;CP={li,x:p.x,z:p.z,sea:1,pt:PN.t,pe:PN.ev};pop(p.x,LY,p.z+130,'KONTROLNÍ BOD','#7fe07a');sfx('flag')}}
+ /* kontrolní bod uprostřed útoku */if(!PN.cpOK&&PN.ev>=11&&live==0&&pend==0&&!(CP&&CP.sea)){PN.cpOK=1;CP={li,x:p.x,z:p.z,sea:1,pt:PN.t,pe:PN.ev};pop(p.x,LY,p.z+130,'KONTROLNÍ BOD','#7fe07a');sfx('flag')}}
 function pnCapArrive(b){spawnB('adm',b.tx,0)}
 function pnCapX(){let best=700,bd=1e9;for(const Z of PNZ)for(let x=Z[0]+30;x<=Z[1]-30;x+=10){const d=Math.abs(Math.abs(x-p.x)-300);if(d<bd){bd=d;best=x}}return best}
 /* varovná rána vedle lodi */
@@ -15536,7 +15536,7 @@ function pnHud(){if(!pnOn()||state!='play'||TR2)return;const w=360,x0=W/2-w/2,y0
   const lx0=x0+76,lx1=x0+w-14,ly=y0+20,k=Math.min(1,PN.t/Tend);X.strokeStyle='rgba(255,236,200,.25)';X.lineWidth=3;X.beginPath();X.moveTo(lx0,ly);X.lineTo(lx1,ly);X.stroke();X.strokeStyle='#e8b860';X.beginPath();X.moveTo(lx0,ly);X.lineTo(pkL(lx0,lx1,k),ly);X.stroke();
   PNTL.forEach((E,i)=>{if(E[1]=='warn')return;const x=pkL(lx0,lx1,E[0]/Tend),done=i<PN.ev;pnIcon(E[1],x,ly-(E[1]=='boat'?9:E[1]=='cap'?1:-9),E[1]=='cap'?1.3:1,done?.35:1)});
   pnIcon('ship',pkL(lx0,lx1,k),ly+2,1,1);
-  const nx=pnNext();let txt='';if(PN.cap)txt='Kapitán Calavera připlouvá!';else if(nx){const sec=Math.max(0,Math.ceil((nx[0]-PN.t)/60)),nm=nx[1]=='boat'?'Další člun':nx[1]=='vol'?'Salva z děl':nx[1]=='cap'?'Kapitán':'Vdova';const busy=pnLive()+pnPending()*2>=6&&nx[1]!='vol'&&PN.t>=nx[0]-1;txt=busy?nm+' čeká – paluba je plná':nm+' za 0:'+String(sec).padStart(2,'0')}
+  const nx=pnNext();let txt='';if(PN.cap)txt='Kapitán Calavera připlouvá!';else if(nx){const sec=Math.max(0,Math.ceil((nx[0]-PN.t)/60)),nm=nx[1]=='boat'?'Další člun':nx[1]=='vol'?'Salva z děl':nx[1]=='cap'?'Kapitán':'Vdova';const busy=pnLive()+pnPending()*2>=9&&nx[1]!='vol'&&PN.t>=nx[0]-1;txt=busy?nm+' čeká – paluba je plná':nm+' za 0:'+String(sec).padStart(2,'0')}
   X.font='italic 10.5px Georgia';X.fillStyle='rgba(244,226,188,.85)';X.textAlign='left';X.fillText(txt,x0+10,y0+31);
   const live=pnLive(),pend=PN.boats.filter(b=>b.st=='row'||b.st=='lower').length;X.textAlign='right';X.fillStyle='#ffcf8a';X.fillText((pend?'čluny na vodě: '+pend+'  •  ':'')+'na palubě: '+live,x0+w-10,y0+31);X.restore()}
  if(PN.ann){const a=Math.max(0,Math.min(1,PN.ann.t/10,(220-PN.ann.t)/24));X.save();X.globalAlpha=a;X.textAlign='center';X.font='700 16px Georgia';X.lineWidth=5;X.strokeStyle='#120806';const y=bossE&&bossE.st!='dead'?120:150;X.strokeText(PN.ann.tx,W/2,y);X.fillStyle='#ffe2a0';X.fillText(PN.ann.tx,W/2,y);X.restore()}}
