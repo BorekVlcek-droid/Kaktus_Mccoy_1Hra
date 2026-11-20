@@ -7689,7 +7689,7 @@ function trHzDraw(){if(!onTrain()||!tvT())return;for(const h of TRH){const x=h.x
    for(let j=yb-30;j>-400;j-=26){X.strokeStyle='rgba(0,0,0,.35)';X.lineWidth=1;X.beginPath();X.moveTo(x-60,j);X.lineTo(x+20,j);X.stroke()}X.fillStyle='rgba(255,200,150,.18)';X.fillRect(x-60,-400,6,yb+410)}
   X.restore()}}
 function trWarnDraw(){const w=TRS.wa;if(!w||!onTrain()||state!='play')return;const a=Math.min(1,w.t/10,(150-w.t)/20),bl=(w.t>>3)%2;X.save();X.globalAlpha=a;const x=W-120,y=150;X.fillStyle=bl?'#ffcf3a':'#ff6a2a';X.strokeStyle='#1a0806';X.lineWidth=3;X.beginPath();X.moveTo(x,y-34);X.lineTo(x+34,y+26);X.lineTo(x-34,y+26);X.closePath();X.fill();X.stroke();X.fillStyle='#1a0806';X.font='700 36px Georgia';X.textAlign='center';X.fillText('!',x,y+18);
- X.font='700 15px Georgia';X.lineWidth=4;const t1=w.k=='tunnel'?'TUNEL!':w.k=='sig'?'NÁVĚSTIDLO!':'MOST!',t2='↓ skrč se';X.strokeText(t1,x,y+50);X.fillStyle='#ffe28a';X.fillText(t1,x,y+50);X.font='13px Georgia';X.strokeText(t2,x,y+68);X.fillStyle='#fff';X.fillText(t2,x,y+68);X.textAlign='left';X.restore()}
+ X.font='700 15px Georgia';X.lineWidth=4;const t1=w.k=='tunnel'?'TUNEL!':w.k=='sig'?'NÁVĚSTIDLO!':'MOST!',t2='';X.strokeText(t1,x,y+50);X.fillStyle='#ffe28a';X.fillText(t1,x,y+50);X.font='13px Georgia';X.strokeText(t2,x,y+68);X.fillStyle='#fff';X.fillText(t2,x,y+68);X.textAlign='left';X.restore()}
 function trSmokeDraw(){if(!onTrain()||!tvT())return;X.save();for(const s of TRSM){const x=s.x-cam,y=LY-s.z;if(x<-120||x>W+120)continue;const a=s.a*Math.max(0,1-s.t/240);const g=X.createRadialGradient(x,y,0,x,y,s.r);g.addColorStop(0,s.dark?'rgba(40,36,40,'+a+')':'rgba(120,110,110,'+a*.7+')');g.addColorStop(1,'rgba(60,50,50,0)');X.fillStyle=g;X.fillRect(x-s.r,y-s.r,s.r*2,s.r*2)}X.restore()}
 {const _bf=bFx;bFx=function(){_bf();if(onTrain()&&tvT()){trSmokeDraw();trHzDraw();for(const r of TRR)trRiderDraw(r)}}}
 {const _hd=hud;hud=function(){_hd();if(onTrain()&&tvT()&&(state=='play'||state=='cut')){trWarnDraw();if(TSPD>6&&SV.fx){X.save();X.strokeStyle='rgba(255,240,220,.12)';X.lineWidth=1;for(let i=0;i<14;i++){const y=(hs(i)*H*.8+30)|0,x=((hs(i+20)*W*3-T*TSPD*1.6)%(W+300)+W+300)%(W+300)-150;X.beginPath();X.moveTo(x,y);X.lineTo(x+60+hs(i+4)*80,y);X.stroke()}X.restore()}}}}
@@ -12138,7 +12138,7 @@ function m3Back3(){mn.sub=0;mn.s=Math.max(0,MI().indexOf('Nastavení'))}
 {const _s=sfx;sfx=function(n,x){if(M3.mute&&(n=='gun'||n=='uiok'))return;return _s(n,x)}}
 updMenu=function(){if(!SV.seenTr){SV.seenTr=1;saveSV();openTrailer();return}if(mn.sub==1){mn.sub=0;mn.s=0;openMap(SV.un);return}
  if(M3.go){M3.go.t++;if(M3.go.t>=18){const i=M3.go.i;M3.go=null;M3.mute=1;try{act(i)}finally{M3.mute=0}}return}
- if(++MIDLE>1800&&mn.sub==0){MIDLE=0;openTrailer();return}
+ /* v94: trailer se v menu sám znovu nespouští */
  const n=MI().length;if(P.ArrowDown||P.KeyS){mn.s=(mn.s+1)%n;sfx('ui')}if(P.ArrowUp||P.KeyW){mn.s=(mn.s+n-1)%n;sfx('ui')}
  if(mn.sub==3){const d=(P.ArrowRight||P.KeyD?1:0)-(P.ArrowLeft||P.KeyA?1:0);if(d)m3Adj(mn.s,d)}
  if(P.Enter||P.Space)m3Go(mn.s);if(P.Escape&&mn.sub){sfx('uiok');m3Back3()}};
@@ -15503,6 +15503,14 @@ try{if(typeof ACH2!='undefined'&&!ACH2.some(a=>a[0]=='sunk'))ACH2.push(['sunk','
 
 /* v93: základní trailer končí před přehlídkou bossů – zůstává jen závěrečná karta KAKTUS */
 {const i=TRB3.findIndex(b=>b.k=='boss'),f=TRB3.find(b=>b.k=='final');if(i>=0)TRB3.splice(i,TRB3.length-i,...(f?[f]:[]))}
+/* v94: karta KAKTUS na konci traileru zůstane, dokud hráč nestiskne klávesu nebo neklikne */
+{const f=TRB3.find(b=>b.k=='final');if(f){f.d=1e9;f.hold=1}}
+function trHoldB(){const R=TR2;if(!R)return null;const b=(R.B||TRB)[R.i];return b&&b.hold?b:null}
+{const _u=trUpd;trUpd=function(){const b=trHoldB();if(b&&TR2.t>20&&(P.Space||kp('jump')||kp('attack')||TR2.go)){trEnd();return true}return _u.apply(this,arguments)}}
+addEventListener('pointerdown',()=>{try{if(trHoldB())TR2.go=1}catch(e){}});
+/* v94: v ukázkách hry v traileru (a v závěru) žádné vyskakující texty */
+{const _p=pop;pop=function(){const n=txt.length,r=_p.apply(this,arguments);if(TR2&&txt.length>n)txt.length=n;return r}}
+{const _w=trWarnDraw;trWarnDraw=function(){if(TR2)return;return _w.apply(this,arguments)}}
 
 window.__HAS=HAS;
 

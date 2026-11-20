@@ -206,7 +206,7 @@ function m3Back3(){mn.sub=0;mn.s=Math.max(0,MI().indexOf('Nastavení'))}
 {const _s=sfx;sfx=function(n,x){if(M3.mute&&(n=='gun'||n=='uiok'))return;return _s(n,x)}}
 updMenu=function(){if(!SV.seenTr){SV.seenTr=1;saveSV();openTrailer();return}if(mn.sub==1){mn.sub=0;mn.s=0;openMap(SV.un);return}
  if(M3.go){M3.go.t++;if(M3.go.t>=18){const i=M3.go.i;M3.go=null;M3.mute=1;try{act(i)}finally{M3.mute=0}}return}
- if(++MIDLE>1800&&mn.sub==0){MIDLE=0;openTrailer();return}
+ /* v94: trailer se v menu sám znovu nespouští */
  const n=MI().length;if(P.ArrowDown||P.KeyS){mn.s=(mn.s+1)%n;sfx('ui')}if(P.ArrowUp||P.KeyW){mn.s=(mn.s+n-1)%n;sfx('ui')}
  if(mn.sub==3){const d=(P.ArrowRight||P.KeyD?1:0)-(P.ArrowLeft||P.KeyA?1:0);if(d)m3Adj(mn.s,d)}
  if(P.Enter||P.Space)m3Go(mn.s);if(P.Escape&&mn.sub){sfx('uiok');m3Back3()}};

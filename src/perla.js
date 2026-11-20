@@ -452,3 +452,11 @@ try{if(typeof ACH2!='undefined'&&!ACH2.some(a=>a[0]=='sunk'))ACH2.push(['sunk','
 
 /* v93: základní trailer končí před přehlídkou bossů – zůstává jen závěrečná karta KAKTUS */
 {const i=TRB3.findIndex(b=>b.k=='boss'),f=TRB3.find(b=>b.k=='final');if(i>=0)TRB3.splice(i,TRB3.length-i,...(f?[f]:[]))}
+/* v94: karta KAKTUS na konci traileru zůstane, dokud hráč nestiskne klávesu nebo neklikne */
+{const f=TRB3.find(b=>b.k=='final');if(f){f.d=1e9;f.hold=1}}
+function trHoldB(){const R=TR2;if(!R)return null;const b=(R.B||TRB)[R.i];return b&&b.hold?b:null}
+{const _u=trUpd;trUpd=function(){const b=trHoldB();if(b&&TR2.t>20&&(P.Space||kp('jump')||kp('attack')||TR2.go)){trEnd();return true}return _u.apply(this,arguments)}}
+addEventListener('pointerdown',()=>{try{if(trHoldB())TR2.go=1}catch(e){}});
+/* v94: v ukázkách hry v traileru (a v závěru) žádné vyskakující texty */
+{const _p=pop;pop=function(){const n=txt.length,r=_p.apply(this,arguments);if(TR2&&txt.length>n)txt.length=n;return r}}
+{const _w=trWarnDraw;trWarnDraw=function(){if(TR2)return;return _w.apply(this,arguments)}}
