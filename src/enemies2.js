@@ -115,6 +115,6 @@ function v2Apply(e,vr){e.vr=vr;if(vr=='kus'){e.am=1}else if(vr=='harp'){e.hp=Mat
 {const _s=seaE;seaE=function(x){const e=_s(x);try{if(!TR2&&lv&&lv.k=='sea'){if(e.t=='l'&&Math.random()<.6)v2Apply(e,'harp');else if(e.t=='g'&&Math.random()<.2){e.t='l';mkLook(e);v2Apply(e,'harp')}}}catch(err){}return e}}
 /* --- první setkání: krátká rada --- */
 const V2SEEN={lv:-1,s:{}};const V2TIP={kus:'Bažinný kušiník! Šipky z kuše letí obloukem – po výstřelu ji musí znovu natáhnout. To je tvoje chvíle.',mnr:'Důlní hlídač s čelovkou! Nevstupuj do kužele světla – uvidí tě i v té největší tmě.',harp:'Harpunář! Když tě harpuna trefí, přitáhne si tě k sobě – mačkej ← → a vysmekni se.'};
-{const _q=qUpd;qUpd=function(){_q();try{if(TR2||state!='play')return;if(V2SEEN.lv!=li){V2SEEN.lv=li;V2SEEN.s={}}for(const e of ens){if(e.vr&&e.st!='dead'&&!V2SEEN.s[e.vr]&&Math.abs(e.x-cam-W/2)<W/2-40){V2SEEN.s[e.vr]=1;if(!(SV.v2t&&SV.v2t[e.vr])){SV.v2t=SV.v2t||{};SV.v2t[e.vr]=1;saveSV();say(V2TIP[e.vr])}}}}catch(err){}}}
+/* v91: představovací tipy k novým enemigos vypnuty */
 /* vlastní (širší) okno pro obrysy a překryvy mimo něj (lano harpuny, kužel čelovky, ukazatele) */
 {const _f=fxE;fxE=function(e){if(e&&e.vr&&V2N[e.vr]&&E2S.ok){if(e.st=='swing'&&e.sw<0)return;eLines(e);fxDraw(e.x-cam,LY-e.z,300,272,()=>dE(e));if(e._ov){const f=e._ov;e._ov=null;f()}return}return _f(e)}}

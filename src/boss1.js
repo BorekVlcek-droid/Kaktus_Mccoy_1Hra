@@ -134,10 +134,10 @@ function cpDrawAll(){const c=CAP.can;if(!c)return;const x=c.x-cam,y=LY-c.z;
 {const _df=dFx;dFx=function(){_df();try{if(cpArenaOK()&&CAP.on)cpHints()}catch(err){console.error('cph',err)}}}
 /* nápovědy u děla a zaměřovač na kapitánovi */
 function cpHints(){const c=CAP.can,e=bossE;if(!c||state!='play'||!CAP.on)return;const x=c.x-cam,y=LY-c.z;
- let t=null;if(cpNearCan()){if(CAP.carry&&c.st=='empty')t='[E] Nabít';else if(c.st=='loaded')t='[E] Zapálit doutnák';else if(c.st=='empty')t='Přines kouli';}else if(!CAP.carry&&(cpNearPile()||cpLooseNear()))t='[E] Zvednout kouli';
+ let t=null;if(cpNearCan()){if(CAP.carry&&c.st=='empty')t='[E] Nabít';else if(c.st=='loaded')t='[E] Zapálit doutnák';}else if(!CAP.carry&&(cpNearPile()||cpLooseNear()))t='[E] Zvednout kouli';
  if(t){X.save();X.font='700 13px Georgia';const w=X.measureText(t).width+20,hx=(cpNearCan()?x:p.x-cam)-w/2,hy=(cpNearCan()?y-92:LY-p.z-150);X.fillStyle='rgba(20,10,6,.75)';X.beginPath();X.roundRect(hx,hy,w,22,11);X.fill();X.strokeStyle='#e8c34a';X.lineWidth=1.4;X.stroke();X.fillStyle='#ffe8b0';X.fillText(t,hx+10,hy+15.5);X.restore()}
  if(c.st=='fuse'){const u=c.fuse/CPF;X.save();X.fillStyle='rgba(0,0,0,.6)';X.fillRect(x-30,y-82,60,7);X.fillStyle=u<.3?'#ff6a3a':'#ffd44a';X.fillRect(x-29,y-81,58*u,5);X.restore()}
- if(e&&e.bst=='onship'&&CAP.mode=='salvo'&&CAP.ship&&!CAP.shot){const S=CAP.ship,tx=S.x-30-cam,ty=LY-112,r=26+Math.sin(T*.3)*3;X.save();X.strokeStyle='rgba(140,255,150,.95)';X.lineWidth=3;X.beginPath();X.arc(tx,ty,r,0,7);X.stroke();for(let k=0;k<4;k++){const a=k*Math.PI/2+T*.03;X.beginPath();X.moveTo(tx+Math.cos(a)*(r-8),ty+Math.sin(a)*(r-8));X.lineTo(tx+Math.cos(a)*(r+8),ty+Math.sin(a)*(r+8));X.stroke()}X.font='800 16px Georgia';X.textAlign='center';X.lineWidth=4;X.strokeStyle='rgba(0,0,0,.8)';const tt='PAL NA LOĎ! '+(CAP.shipHits||0)+'/'+cpSalvoCfg().need;X.strokeText(tt,tx,ty-r-12);X.fillStyle='#9cff8a';X.fillText(tt,tx,ty-r-12);X.textAlign='left';X.restore()}
+ /* v91: zaměřovač „PAL NA LOĎ!“ vypnut */
  /* zaměřovač: zelený = zapal teď a koule dorazí, když bude bezbranný */
  if(e&&e.B=='cap'&&e.st!='dead'&&e.bst!='onship'&&e.z<400&&(c.st=='loaded'||c.st=='fuse')&&!CAP.shot){const w=cpWin(e),arr=cpArrive(e,c.st=='fuse'),good=w&&arr>=w[0]-4&&arr<=w[1]-2;const ex=e.x-cam,ey=LY-e.z-96,r=good?30+Math.sin(T*.3)*3:34;
   X.save();X.strokeStyle=good?'rgba(140,255,150,.95)':'rgba(255,120,90,.55)';X.lineWidth=good?3:2;X.beginPath();X.arc(ex,ey,r,0,7);X.stroke();for(let k=0;k<4;k++){const a=k*Math.PI/2+T*.03;X.beginPath();X.moveTo(ex+Math.cos(a)*(r-8),ey+Math.sin(a)*(r-8));X.lineTo(ex+Math.cos(a)*(r+8),ey+Math.sin(a)*(r+8));X.stroke()}
@@ -297,7 +297,7 @@ function cpArenaProps(){const c=CAP.can,e=bossE;if(!c)return;const bmp=CAP.bump&
 BD.cap.hp=130;
 /* profil bosse, rady na kartě */
 Object.assign(BPROF.cap,{k:1.05,hx:22,hy:-196,pose:['laugh',20],rp:['rage',40],q:'„Šťáva Srdce patří Baronovi. A ty půjdeš ke dnu, bodlinatý!“',tn:['¡Jo-jo-jo!','K rybám s tebou!','Kyj tě srovná!','Harr! Ještě stojíš?'],die:'Moje… loď…'});
-BTIP.cap=['4 fáze: kyj a lano → abordáž → salva → rum a zuřivost','Býčí útok – vyskoč na paletu','Při salvě střílej z děla na loď (2 zásahy)','Omráčený kapitán = mlať ho! Dělo [E] ho srazí k zemi.'];
+/* v91: BTIP.cap – rady k bossovi vypnuty */
 
 /* =====================================================================
    ÚVODNÍ FILMOVÁ SCÉNA: loď z mlhy, dýmka, skok, dopad, odhalení děla
@@ -322,7 +322,7 @@ BPS.cap={dur:560,
   if(t>=345&&t<385){bpPose(q,'point',20);if(t==345){b1Sub('KAPITÁN ANCLA','…a ty půjdeš ke dnu, bodlinatý!',90);sfx('vCap',q.x);B1C.zt=1.3}}
   if(t==385){B1C.zt=1.22;sfx('whoosh',p.x);c.ck=.16}
   if(t>=385&&t<450){bpPose(q,'idle',60);if(t==398)b1Sub('KAKTUS','Hora svalů… Až se omámí, je můj. A to dělo se taky hodí!',100)}
-  if(t==450){B1C.zt=1;B1C.vigT=0;b1Sub('','Býčí útok → vyskoč na paletu. Hvězdičky nad hlavou → mlať ho! Dělo [E] ho srazí k zemi.',150)}
+  if(t==450){B1C.zt=1;B1C.vigT=0;}
   if(t>=450){if(t<505)bpPose(q,'whirl',Math.max(40,116-(t-450)*2));else bpPose(q,'idle',60);if(t%10==0&&t<505)sfx('whoosh',q.x);if(t==505)cpSay(q,'¡A pelear!')}
   if(c.ring)c.ring.forEach(r=>{r.t++;r.x-=.6;r.z+=.5});
   if(t>=c.end-2){B1C.zt=1;B1C.vigT=0;B1C.slow=1;if(S){S.x=BX+300;S.tilt=0}}},

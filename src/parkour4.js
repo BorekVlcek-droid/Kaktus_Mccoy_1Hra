@@ -6,7 +6,7 @@ Object.assign(SFX,{boing:{p:[['t',{w:'triangle',f:150,f2:520,d:.2,g:.22}],['t',{
  slide:{p:[['n',{d:.32,g:.22,ft:'bandpass',f:900,f2:300,q:.8,a:.02}]],mi:200},
  steam:{p:[['n',{d:.5,g:.3,ft:'highpass',f:1800,f2:3000,a:.03}]],mi:200}});
 const pk4Kd=a=>typeof kd=='function'&&kd(a);
-function pk4Hint(k,t){SV.pkh=SV.pkh||{};if(SV.pkh[k])return;SV.pkh[k]=1;try{say(t)}catch(e){}}
+function pk4Hint(){}/* v91: parkourové tipy vypnuty */
 /* ---------- rozmístění podle tvaru úrovně ---------- */
 function pk4Clear(x0,x1,z0,z1,ign){if(sol.some(o=>o!==ign&&!o.gone&&o.x<x1&&o.x+o.w>x0&&o.b<z1&&o.t>z0))return false;if(lad.some(l=>l.x>x0-10&&l.x<x1+10&&l.z1>z0&&l.z0<z1))return false;
  if(deco.some(d=>d.k=='mz'&&d.x<x1&&d.x+d.w>x0&&d.z0<z1&&d.z1>z0))return false;if(ZL.some(l=>Math.min(l.x1,l.x2)<x1&&Math.max(l.x1,l.x2)>x0&&Math.min(l.z1,l.z2)-110<z1&&Math.max(l.z1,l.z2)>z0))return false;return true}
@@ -85,11 +85,11 @@ function pk4Slide(){if(p.sld>0){const d=Math.sign(p.sdv)||p.face;p.sld--;p.cr=1;
 function pk4BncUnder(){if(!p.on)return null;for(const b of PK4.bn)if(p.x+9>b.x&&p.x-9<b.x+b.w&&Math.abs(p.z-b.t)<1)return b;for(const o of sol)if(o.s=='awning'&&p.x+9>o.x&&p.x-9<o.x+o.w&&Math.abs(p.z-o.t)<1)return o;return null}
 {const _u=updP;updP=function(){const vz0=p.vz,on0=p.on,b0=on0?pk4BncUnder():null,r=_u.apply(this,arguments);try{
  const b=pk4BncUnder();if(b&&!pk4Kd('down')){const aw=b.s=='awning';
-  if(!on0&&vz0<(aw?-7:-2.5)){const v=aw?Math.min(13,-vz0*.8+2):Math.max(12.5,Math.min(16.5,-vz0*1.1+4));p.vz=v;p.vlt=24;p.on=false;p.z+=1;p.ld=0;b.sq=1;sfx('boing');spawnP(p.x,LY,6,b.bk=='levi'?'#e0e8f0':'#e8d8a8',2,8,b.t);if(b.bk=='levi')sfx('steam');if(!aw)pk4Hint('bnc','Trampolína! Skoč na ni z výšky a vyletíš až na střechu.')}}
+  if(!on0&&vz0<(aw?-7:-2.5)){const v=aw?Math.min(13,-vz0*.8+2):Math.max(12.5,Math.min(16.5,-vz0*1.1+4));p.vz=v;p.vlt=24;p.on=false;p.z+=1;p.ld=0;b.sq=1;sfx('boing');spawnP(p.x,LY,6,b.bk=='levi'?'#e0e8f0':'#e8d8a8',2,8,b.t);if(b.bk=='levi')sfx('steam');}}
  if(b0&&on0&&!p.on&&p.vz>9&&p.vz<11){p.vz=15;p.vlt=20;b0.sq=1;sfx('boing')}
  for(const q of PK4.bn)if(q.sq>0)q.sq=Math.max(0,q.sq-.08);for(const o of sol)if(o.s=='awning'&&o.sq>0)o.sq=Math.max(0,o.sq-.08);
  if(!PK4.seen.rope&&RS.some(r=>Math.abs(r.ax-p.x)<380)){PK4.seen.rope=1;pk4Hint('rope0','Nad propastí visí lano – skoč a chyť se ho!')}
- if(!PK4.seen.bn&&PK4.bn.some(q=>Math.abs(q.x-p.x)<360)){PK4.seen.bn=1;pk4Hint('bnc0','Trampolína! Skoč na ni z výšky a vyletíš až na střechu.')}}catch(e){}return r}}
+ if(!PK4.seen.bn&&PK4.bn.some(q=>Math.abs(q.x-p.x)<360)){PK4.seen.bn=1;}}catch(e){}return r}}
 /* zip → lano → skluz; jinak běžný pohyb */
 zipUpd=function(){if(!p||p.dead){if(p){p.zip=null;p.rope=null;p.sld=0}return false}
  if(p.zip||!p.rope&&!(p.sld>0)){if(pk4Zip())return true}

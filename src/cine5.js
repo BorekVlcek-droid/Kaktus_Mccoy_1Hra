@@ -79,7 +79,7 @@ BPS.cap={dur:660,c5:1,
   if(t>=548&&t<590){bpPose(q,'slam',Math.max(0,40-(t-548)*2));q.face=-1;if(t==560){c.cr=1;stop=6;shake=18;B1C.flash=.6;sfx('heavy',LX);sfx('break',LX);try{cpSmash(LX,30)}catch(e){}bpSplinters(LX,60,18,'#8a5a30');ring(LX,LY,120,'rgba(255,230,170,.85)',22,0);spawnP(LX,LY,26,'#b08a5a',5,46,20);c5Slow(c,22,.4);
     for(let i=0;i<16;i++)c2P({x:LX+R(-30,30),z:R(30,90),vx:R(-5,5),vz:R(2,7),g:.3,L:R(30,50),c:'#9cff8a',s:R(3,5)})}c5Shot(c,LX+20,110,1.35,.1)}
   if(t>=590&&t<660){bpPose(q,t<620?'twirl':'roar',t<620?60:Math.max(0,110-(t-620)*2));c5Shot(c,(p.x+QX)/2,120,1.1,.06);if(t%10==0&&t<620)sfx('whoosh',QX);if(t==624){sfx('roar',QX);sfx('vCap',QX);shake=9}
-   if(t==600)c5Say('','Býčí útok → vyskoč na paletu. Hvězdičky nad hlavou → mlať ho! Dělo [E] ho srazí k zemi.',160)}
+   }
   for(const m of c.coins){m.l++;m.x+=m.vx;m.z+=m.vz;m.vz-=.4}c.coins=c.coins.filter(m=>m.l<m.L);
   if(c.dust==null)c.dust=[]},
  back(c,t,q){const LX=BX+PI2.LX,CX=LX+150;c5Chest(c5X(CX),c5Y(0),1,t)},

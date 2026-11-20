@@ -1,17 +1,14 @@
 /* =====================================================================
    v88: BOJ A OBSAH – styl, protiútok, popravy, nabitý úder, elitní
-   enemigos, zuřivost bossů, truhly, zvony výzvy, pomoc, efekty, tipy
+   enemigos, zuřivost bossů, truhly, zvony výzvy, pomoc, efekty
+   v91: bez tipů, bez elitních enemigos a bez nápovědy k popravě
    ===================================================================== */
-const BOJ={v:0,rk:0,idle:0,mv:[],ctx:null,brk:0,pw:0,pcd:0,pa:0,pf:0,ch:0,ccd:0,rkUp:0,drop:0,rep:0,nw:0,last:null,lt:0,ma:0,sl:[],fz:[],chs:[],bell:null,
- sid:0,init:-1,dth:{},asD:1,kc:0,flash:0,fc:'255,90,60',tip:null,tipQ:[],eng:0,engT:0,hb:0,perf:{n:0,s:0},ban:null,bl:0,blx:0,blz:0,blf:1,inX:0,zt:0};
+const BOJ={v:0,rk:0,idle:0,mv:[],ctx:null,brk:0,pw:0,pcd:0,pa:0,pf:0,ch:0,ccd:0,rkUp:0,drop:0,rep:0,nw:0,last:null,lt:0,ma:0,sl:[],chs:[],bell:null,
+ sid:0,init:-1,dth:{},asD:1,kc:0,flash:0,fc:'255,90,60',eng:0,engT:0,hb:0,perf:{n:0,s:0},ban:null,bl:0,blx:0,blz:0,blf:1,inX:0,zt:0};
 const BJR=['D','C','B','A','S','SS','SSS'],BJN=['DRSNÝ','CVALEM!','BRAVO!','¡AY, CARAMBA!','ŠERIF!','SUPER ŠERIF!','SRDCE POUŠTĚ!'],
  BJC=['#c8c8c8','#7fc8ff','#7fe07a','#ff9a3a','#ffd44a','#ff7ad8','#ff4a3a'];
 const BJP={pt:5,hv:9,up:10,air:10,slam:12,rng:6,thr:14,parry:26,exec:30,chg:18,td:20,env:9,kick:9,wpn:7};
 const BJL={pt:'úder',hv:'těžký úder',up:'výmet',air:'ze vzduchu',slam:'dupák',rng:'střela',thr:'hod',parry:'protiútok',exec:'poprava',chg:'nabitý úder',td:'atentát',env:'prostředí',kick:'kop',wpn:'zbraň'};
-const BJE={panc:{n:'PANCÉŘOVANÝ',c:'#b4c0d0',r:'170,190,215',t:'#6a7684',d:'Pancíř prorazíš těžkým či nabitým úderem nebo hodem.'},
- rych:{n:'RYCHLÍK',c:'#5ab8ff',r:'80,170,255',t:'#2a64a0',d:'Rychlejší pohyb i útoky.'},
- vyb:{n:'VÝBUŠNÝ',c:'#ff9a3a',r:'255,140,40',t:'#c8561a',d:'Po smrti vybuchne – uteč od těla!'},
- zur:{n:'ZUŘIVEC',c:'#ff5a4a',r:'255,70,50',t:'#8a1212',d:'Víc zdraví, zraněný zuří a zrychlí.'}};
 const BJCH=42;
 Object.assign(SFX,{
  bjParry:{p:[['n',{d:.05,g:.55,ft:'highpass',f:3200}],['t',{w:'square',f:1900,f2:1750,d:.22,g:.09}],['t',{w:'triangle',f:2650,f2:2550,d:.45,g:.09}],['t',{f:240,f2:80,d:.16,g:.55}]],rv:.5},
@@ -43,19 +40,8 @@ function bjSty(k,m){if(!bjOn())return;const L=BOJ.mv,b=BJP[k]||5,same=k==BOJ.las
 function bjRank(){const r=Math.max(0,Math.min(6,BOJ.v/100|0));if(r>BOJ.rk){BOJ.rkUp=56;sfx('bjRank');if(r>=3&&p)pop(p.x,LY,p.z+168,BJN[r],BJC[r]);if(r>=1)bjTip('sty');const s=bjSV();if(r>(s.smx|0)){s.smx=r;try{pgAchCheck()}catch(e){}}}BOJ.rk=r}
 {const _a=addSc;addSc=function(n){return _a(n*(1+BOJ.rk*.2))}}
 
-/* ---------- tipy ---------- */
-const BJT={parry:()=>'PROTIÚTOK: stiskni '+bjK('crouch')+' těsně před zásahem – útok odrazíš a útočníka omráčíš.',
- exec:()=>'Nepřítel je omráčený! Stiskni u něj '+bjK('attack')+' – POPRAVA ho vyřídí na místě.',
- chg:()=>'Podrž '+bjK('heavy')+' – NABITÝ ÚDER prorazí kryt, štít i pancíř.',
- sty:()=>'STYL roste za pestré tahy. Kdo opakuje pořád totéž, klesá. Vyšší styl = víc bodů a zlaťáků.',
- elite:()=>'ELITNÍ nepřítel! Barva aury prozradí jeho zvláštní schopnost (viz Deník → TAHY).',
- chest:()=>'Truhla s pokladem! Vyšplhej k ní a otevři ji '+bjK('interact')+'.',
- bell:()=>'ZVON VÝZVY: rozezvoň ho '+bjK('interact')+' a poraz dvě vlny nepřátel, než vyprší čas.',
- assist:()=>'Šerifova pomoc: po několika pádech tu rozdáváš silnější rány.',
- boss:()=>'Boss ZUŘÍ! Útočí rychleji – drž si odstup a trestej jeho chyby.',
- perf:()=>'Kvůli plynulosti jsem vypnul náročné světelné efekty (zapneš je v Nastavení).'};
-function bjTip(k,force){const s=bjSV();if((!force&&s.tips[k])||BOJ.tipQ.includes(k)||(BOJ.tip&&BOJ.tip.k==k))return;BOJ.tipQ.push(k)}
-function bjTipTick(){if(BOJ.tip){BOJ.tip.t++;if(BOJ.tip.t>360)BOJ.tip=null}else if(BOJ.tipQ.length&&state=='play'&&!TR2){const k=BOJ.tipQ.shift();BOJ.tip={k,t:0,tx:BJT[k]()};bjSV().tips[k]=1;try{saveSV()}catch(e){}}}
+/* ---------- tipy: v91 vypnuty (hra nevede za ručičku) ---------- */
+function bjTip(){}
 
 /* ---------- protiútok ---------- */
 function bjParry(dir){BOJ.pw=0;BOJ.pcd=0;BOJ.pf=20;p.inv=Math.max(p.inv|0,40);p.ht=0;stop=Math.max(stop,7);shake=Math.max(shake,7);SLO=Math.max(SLO,340);sfx('bjParry');sfx('block');
@@ -96,51 +82,33 @@ function bjBlast(){const C=SV.cls,bm=MEL[C].d*(1+upv('blade')*.3),dmg=bm*3.2,f=p
  for(let i=0;i<16;i++)par.push({x:p.x+f*R(10,150),y:LY,z:p.z+R(4,96),vx:f*R(2,8),vz:R(1,5),l:R(18,30),c:i%2?'#ffe6a0':'#fff',s:R(2,4)});
  BOJ.bl=18;BOJ.blx=p.x;BOJ.blz=p.z;BOJ.blf=f;noise(p.x,LY,420);pop(p.x+f*70,LY,p.z+150,'NABITÝ ÚDER!','#ffd44a');if(!n)bjSty('chg',.4)}
 
-/* ---------- výbuch výbušného elity ---------- */
-function bjBoom(F){const e=F.e,x=e?e.x:F.x,z=e?e.z:F.z,c0=BOJ.ctx;sfx('boom',x);sfx('heavy',x);shake=Math.max(shake,12);fx.push({k:'boom',x,y:LY,z:z+40,l:28,L:28});ring(x,LY,124,'rgba(255,170,60,.9)',22,z);ring(x,LY,70,'rgba(255,240,200,.9)',14,z+30);
- spawnP(x,LY,24,'#ff9a3a',5,60,z);spawnP(x,LY,14,'#3a3030',3,60,z);if(e)e.dt=Math.max(e.dt|0,140);
- if(bjOn()&&Math.abs(p.x-x)<108&&Math.abs(p.z-z)<84)hurtP(1,Math.sign(p.x-x)||1);
- BOJ.ctx='env';try{for(const o of ens.slice()){if(o==e||o.st=='dead'||o.civ||o.st=='held')continue;if(Math.abs(o.x-x)<128&&Math.abs(o.z-z)<84)hurtE(o,isB(o)?1.5:3,Math.sign(o.x-x)||1,6,0)}}finally{BOJ.ctx=c0}
- bar.forEach(b=>{if(!b.g&&Math.abs(b.x-x)<112&&Math.abs(b.z-z)<72)hitBar(b,3)});noise(x,LY,520)}
 
 /* ---------- zásahy enemigos ---------- */
 function bjKill(e,ctx){if(TR2||!e||e._bk)return;e._bk=1;if(isB(e)||AN[e.t]||e.civ)return;const s=bjSV();
- if(e.el){s.eli=(s.eli|0)+1;bjCoins(5,e.x,e.z+110);pop(e.x,LY,e.z+168,'ELITA PADLA! +5 $','#ffd44a');sfx('coin');if(e.el=='vyb')BOJ.fz.push({e,x:e.x,z:e.z,t:48});try{pgAchCheck()}catch(er){}}
  if(BOJ.rk>=3)bjCoins(BOJ.rk>=5?2:1,e.x,e.z+90);
  const left=ens.some(o=>o!=e&&o.st!='dead'&&!AN[o.t]&&!o.civ&&o.st!='pat'&&o.st!='inv'&&o.st!='ride'&&Math.abs(o.x-p.x)<950);
  if(!left&&BOJ.eng>=3&&!(BOJ.kc>0)&&!bossE&&!(BOJ.bell&&BOJ.bell.st==1)){SLO=Math.max(SLO,700);BOJ.kc=70;BOJ.eng=0;sfx('bjKill');pop(e.x,LY,e.z+186,'ČISTO!','#ffe6a0')}}
 {const _h=hurtE;hurtE=function(e,d,dir,la,mel){
  if(!e||TR2||e.st=='dead')return _h.apply(this,arguments);
  const ctx=BOJ.ctx||(mel?'pt':'rng'),hp0=e.hp;
- if(e.el=='panc'&&e.arm>0&&!isB(e)&&!(e.st=='under'||e.st=='rise')){const big=BOJ.brk||(mel&&(p.hv||p.up))||ctx=='slam'||ctx=='thr'||ctx=='env'||ctx=='exec';
-  if(big)e.arm=Math.max(0,e.arm-2);else{e.arm--;d*=.3}sfx('block',e.x);spawnP(e.x,LY,7,'#c8d0dc',3,60,e.z);
-  for(let i=0;i<5;i++)par.push({x:e.x,y:LY,z:e.z+60,vx:-(dir||1)*R(1,4)+R(-1,1),vz:R(2,6),l:R(14,24),c:'#e8f0ff',s:2});pop(e.x,LY,e.z+118,e.arm>0?'PANCÍŘ '+e.arm+'/3':'PANCÍŘ ZNIČEN!','#c8d4e8')}
  if(BOJ.asD>1)d*=BOJ.asD;
  const he0=BOJ.he;BOJ.he=e;let r;try{r=_h.call(this,e,d,dir,la,mel)}finally{BOJ.he=he0}
  if(la>5&&!e._gb)e._la=3;e._gb=0;
  if(e.hp<hp0&&!AN[e.t]&&!e.civ&&!TR2){const kill=e.hp<=0;if(state=='play')bjSty(ctx,kill?1.6:1);if(mel||ctx=='chg'||ctx=='air'||ctx=='slam')BOJ.sl.push({x:e.x,z:e.z+58,d:dir||p.face,l:10,big:ctx=='hv'||ctx=='up'||ctx=='chg'?1:0});if(kill)bjKill(e,ctx)}
  return r}}
 {const _p=pop;pop=function(x,y,z,t,c){const e=BOJ.he;if(e&&(t=='KRYT PROLOMEN!'||t=='ŠTÍT PROLOMEN!'||t=='PRŮLOM!')){e.exw=1;e._gb=1;e._la=0}return _p.apply(this,arguments)}}
-{const _m=emv;emv=function(e,dx){if(e&&e.el&&(e.el=='rych'||(e.el=='zur'&&e.enr))&&!isB(e))dx*=1.42;return _m(e,dx)}}
 {const _u=updE;updE=function(e){if(!e||TR2||BOJ.inX)return _u(e);
  const sn=e.stn|0;if(sn>(e._sp|0)&&!(e._la>0)&&!isB(e))e.exw=1;if(e._la>0)e._la--;
  const c0=BOJ.ctx;if(!c0)BOJ.ctx=e.st=='thrown'?'thr':'env';let r;try{r=_u(e)}finally{BOJ.ctx=c0}
  e._sp=e.stn|0;if(!(e.stn>0)&&!(e.net>0))e.exw=0;
  if(e.st=='dead')return r;
- if(e.el&&!isB(e)){if(e.el=='zur'&&!e.enr&&e.hp<e.emx*.5){e.enr=1;pop(e.x,LY,e.z+136,'ZUŘÍ!','#ff4a3a');sfx('bjEl',e.x);ring(e.x,LY,50,'rgba(255,70,50,.85)',16,e.z+40)}
-  if((e.el=='rych'||(e.el=='zur'&&e.enr))&&e.cd>0&&T%2==0)e.cd--;
-  if(e.el=='zur'&&e.enr&&T%5==0)par.push({x:e.x+R(-12,12),y:LY,z:e.z+R(60,110),vx:R(-.6,.6),vz:R(1,2.4),l:R(16,26),c:'rgba(255,90,60,.55)',s:R(4,7)})}
  if(isB(e)&&e.mhp&&e.hp>0&&state=='play'&&!cut){
   if(!e.enr&&e.hp<e.mhp*.3){e.enr=1;BOJ.ban={t:0,tx:'ZUŘIVOST!',sub:((e.B&&BD[e.B])?BD[e.B].n:'Boss')+' útočí rychleji'};sfx('roar',e.x);sfx('bjEl',e.x);shake=Math.max(shake,12);bjTip('boss')}
   if(e.enr){if(T%5==0){BOJ.inX=1;try{_u(e)}finally{BOJ.inX=0}}if(T%3==0)par.push({x:e.x+R(-40,40),y:LY,z:e.z+R(20,170),vx:R(-.8,.8),vz:R(1,3),l:R(18,30),c:'rgba(255,60,30,.6)',s:R(3,6)})}}
  return r}}
 
 /* ---------- elity, truhly, zvon: rozmístění ---------- */
-function bjElite(e,k){e.el=k;e.hp*=k=='zur'?1.7:1.45;e.emx=e.hp;e.ks=(e.ks||1)*1.07;if(k=='panc')e.arm=3;const c=BJE[k].t;if(e.pal)e.pal=Object.assign({},e.pal,{tor:c});if(e.v&&e.v.o){e.v.o.coatC=shade(c,-.3);e.v.o.sashC=c}}
-function bjPickEl(e){const mel='fpcmshl'.includes(e.t),ks=mel?['panc','rych','vyb','zur']:['panc','vyb','zur'];return ks[Math.random()*ks.length|0]}
 function bjInitLv(){BOJ.init=BOJ.sid;if(TR2||!lv)return;
- const C=ens.filter(e=>hum(e)&&e.st!='dead'&&!e.el&&!e.fw),ch=.05+li*.02+SV.dif*.03;let n=Math.round(C.length*ch);if(n<1&&li>=1&&C.length>=5)n=1;
- const pool=C.slice();for(let i=0;i<n&&pool.length;i++){const e=pool.splice(Math.random()*pool.length|0,1)[0];bjElite(e,bjPickEl(e))}
  try{bjPlace()}catch(er){console.error('bjPlace',er)}}
 function bjPlace(){BOJ.chs=[];BOJ.bell=null;if(TR2||!lv||lv.k=='sea')return;const s=bjSV(),r=bjRng(li*7919+101),lim=lv.end=='final'?lv.len-1500:(lv.bk&&typeof BX=='number'&&BX>0?BX-700:lv.len-800);
  const cand=sol.filter(o=>!o.gone&&o.dx==null&&!o.mv&&o.k!='deck'&&o.t>=110&&o.t<900&&o.w>=40&&o.x>600&&o.x+o.w<lim).map(o=>({x:Math.round(o.x+o.w/2),z:o.t,k:o.k})).filter(c=>Math.abs(floorAt(c.x,c.z+4,9)-c.z)<1&&!wallAt(c.x,c.z,70,14));
@@ -150,7 +118,7 @@ function bjPlace(){BOJ.chs=[];BOJ.bell=null;if(TR2||!lv||lv.k=='sea')return;cons
   for(let dx=-60;dx<=60;dx+=20){const f=floorAt(x+dx,z+40,9);if(Math.abs(f-z)>4||wallAt(x+dx,z,130,12)||sol.some(o=>o.ow&&!o.gone&&x+dx>o.x-10&&x+dx<o.x+o.w+10&&o.t>z+8&&o.t<z+160))ok=0}if(!ok||BOJ.chs.some(c=>Math.abs(c.x-x)<300)||deco.some(d=>['gear','lpit','board','cage','ccell','heart','lbcar','lpipe'].includes(d.k)&&Math.abs((d.x||0)-x)<220))continue;
   for(let dx=-380;dx<=380;dx+=38){const f=floorAt(x+dx,z+40,9);if(f<z-30||f>z+70||wallAt(x+dx,z+72,100,10))bad++}B.push({x,z,bad,m:Math.abs(x-lv.len*.5)})}
   const mn=Math.min(99,...B.map(b=>b.bad)),C=B.filter(b=>b.bad<=Math.max(3,mn));if(C.length){const c=C[r()*C.length|0];BOJ.bell={x:c.x,z:c.z,st:s.bl[li]?3:0,t:0,T:60*45,w:0,cd:0,ens:[],sw:0}}}}
-{const _s=start;start=function(i,arr){const r=_s.apply(this,arguments);try{BOJ.sid++;BOJ.v=0;BOJ.rk=0;BOJ.mv.length=0;BOJ.ch=0;BOJ.pw=0;BOJ.fz=[];BOJ.sl=[];BOJ.chs=[];BOJ.bell=null;BOJ.ban=null;BOJ.kc=0;BOJ.eng=0;BOJ.flash=0;
+{const _s=start;start=function(i,arr){const r=_s.apply(this,arguments);try{BOJ.sid++;BOJ.v=0;BOJ.rk=0;BOJ.mv.length=0;BOJ.ch=0;BOJ.pw=0;BOJ.sl=[];BOJ.chs=[];BOJ.bell=null;BOJ.ban=null;BOJ.kc=0;BOJ.eng=0;BOJ.flash=0;
  if(BOJ.zt){try{B1C.zt=1}catch(e){}BOJ.zt=0}
  BOJ.asD=1;bjAssist()}catch(er){console.error('bjst',er)}return r}}
 function bjAssist(){const d=BOJ.dth[li]|0,a=TR2||SV.dif>=2?1:d>=5?1.35:d>=3?1.18:1;if(a>BOJ.asD)bjTip('assist',1);BOJ.asD=a}
@@ -167,7 +135,7 @@ function bjBellStart(b){b.st=1;b.t=0;b.w=0;b.ens=[];b.sw=1;b.wt=0;sfx('bjBell',b
 function bjWave(b){b.w++;const n=b.w==1?3:4,types=[...(lv.en||'gf')].filter(t=>t!='k'&&!AN[t]&&LOOK[t]),TT=types.length?types:['g','f'];
  for(let i=0;i<n;i++){const side=i%2?1:-1;let ex=null,fz=0;for(let k=0;k<8&&ex==null;k++){const x=Math.round(b.x+side*(k%2?-1:1)*R(210,380));const f=floorAt(x,b.z+60,9);if(Math.abs(f-b.z)<60&&!wallAt(x,f,100,10)){ex=x;fz=f}}if(ex==null){ex=b.x+side*240;fz=b.z}
   const t=TT[Math.random()*TT.length|0],e=mkE(t,ex,LY);e.z=fz+170;e.gf=fz;e.vz=0;e.st='alert';e.tm=30;e.face=Math.sign(p.x-ex)||1;e.bw=1;e.px0=ex-200;e.px1=ex+200;
-  if(i==0||(b.w==2&&i==1))bjElite(e,bjPickEl(e));ens.push(e);b.ens.push(e);spawnP(ex,LY,10,'#d8c8a8',3,30,fz)}
+  ens.push(e);b.ens.push(e);spawnP(ex,LY,10,'#d8c8a8',3,30,fz)}
  pop(b.x,LY,b.z+210,'VLNA '+b.w+'/2','#ffb14a');sfx('bjEl',b.x)}
 function bjBellTick(){const b=BOJ.bell;if(!b)return;if(b.sw>0)b.sw=Math.max(0,b.sw-.008);
  if(b.st==1){b.t++;const alive=b.ens.filter(e=>e.st!='dead'&&e.z>LOWZ).length;
@@ -191,17 +159,13 @@ function bjFrame(){if(BOJ.init!=BOJ.sid)bjInitLv();
  BOJ.idle++;if(BOJ.idle>110&&BOJ.v>0){BOJ.v=Math.max(0,BOJ.v-(.45+BOJ.rk*.3));BOJ.rk=Math.min(BOJ.rk,BOJ.v/100|0)}
  if(BOJ.kc>0){BOJ.kc--;try{if(B1C.zt==1||BOJ.zt){B1C.zt=BOJ.kc>8?1.07:1;BOJ.zt=BOJ.kc>8?1:0}}catch(e){}}
  BOJ.sl=BOJ.sl.filter(s=>--s.l>0);
- for(const F of BOJ.fz){F.t--;if(F.t%8==0&&F.e)sfx('fuse',F.e.x);if(F.t<=0)bjBoom(F)}BOJ.fz=BOJ.fz.filter(F=>F.t>0);
  bjBellTick();
- if(T%6==0&&p){let n=0;for(const e of ens){if(e.st=='dead'||AN[e.t]||e.civ||isB(e))continue;if(e.st!='pat'&&e.st!='inv'&&e.st!='ride'&&Math.abs(e.x-p.x)<800)n++;
-   if(e.el&&Math.abs(e.x-p.x)<560){bjTip('elite');e.seen=(e.seen|0)+6}if(bjCanX(e)&&Math.abs(e.x-p.x)<320)bjTip('exec')}
-  if(n>0){BOJ.eng=Math.max(BOJ.eng,n);BOJ.engT=200}else if((BOJ.engT-=6)<=0)BOJ.eng=0;
-  for(const c of BOJ.chs)if(!c.op&&Math.abs(c.x-p.x)<620)bjTip('chest');const b=BOJ.bell;if(b&&b.st==0&&Math.abs(b.x-p.x)<620)bjTip('bell')}
+ if(T%6==0&&p){let n=0;for(const e of ens){if(e.st=='dead'||AN[e.t]||e.civ||isB(e))continue;if(e.st!='pat'&&e.st!='inv'&&e.st!='ride'&&Math.abs(e.x-p.x)<800)n++;}
+  if(n>0){BOJ.eng=Math.max(BOJ.eng,n);BOJ.engT=200}else if((BOJ.engT-=6)<=0)BOJ.eng=0;}
  for(const c of BOJ.chs)if(c.op==1)c.t++;
  if(BOJ.ban){BOJ.ban.t++;if(BOJ.ban.t>150)BOJ.ban=null}
  if(p&&!p.dead&&p.hp<=Math.max(1,Math.floor(p.mx*.25))&&p.hp>0){if(++BOJ.hb>=54){BOJ.hb=0;sfx('bjHb')}}else BOJ.hb=40}
 LHK.push(()=>{if(TR2||!p)return;try{bjFrame()}catch(e){console.error('bjf',e)}});
-{const _u=upd;upd=function(){const r=_u.apply(this,arguments);try{bjTipTick()}catch(e){}return r}}
 
 /* ---------- kreslení ve světě ---------- */
 function bjChestDraw(c){const x=c.x-cam,y=LY-c.z;if(x<-60||x>W+60)return;const open=c.op>0,k=c.op==1?Math.min(1,c.t/14):open?1:0;X.save();X.translate(x,y);
@@ -224,34 +188,19 @@ function bjBellDraw(b){const x=b.x-cam,y=LY-b.z;if(x<-90||x>W+90)return;X.save()
  if(b.st==0&&(T%90)<20){const a=Math.sin((T%90)/20*Math.PI);X.save();X.globalCompositeOperation='lighter';X.fillStyle='rgba(255,235,170,'+a+')';X.translate(8,-90);X.beginPath();for(let j=0;j<8;j++){const rr=j%2?1.6:9*a+2;X.lineTo(Math.cos(j*Math.PI/4)*rr,Math.sin(j*Math.PI/4)*rr)}X.closePath();X.fill();X.restore()}
  if(done){X.fillStyle='#a8241a';X.beginPath();X.moveTo(-8,-108);X.lineTo(8,-108);X.lineTo(4,-96);X.lineTo(0,-100);X.lineTo(-4,-96);X.closePath();X.fill()}
  X.restore()}
-function bjAura(e){const x=e.x-cam;if(x<-80||x>W+80)return;const E=BJE[e.el],y=LY-e.z,pu=.5+.5*Math.sin(T*.12+e.x*.01);X.save();
- X.fillStyle='rgba('+E.r+','+(.16+.12*pu)+')';X.beginPath();X.ellipse(x,y,34,9,0,0,7);X.fill();X.strokeStyle='rgba('+E.r+','+(.55+.3*pu)+')';X.lineWidth=2;X.beginPath();X.ellipse(x,y,30+pu*4,8+pu,0,0,7);X.stroke();X.restore()}
 {const _a=dArena;dArena=function(){_a();if(TR2||state=='menu')return;try{BOJ.chs.forEach(bjChestDraw);if(BOJ.bell)bjBellDraw(BOJ.bell);
- for(const e of ens)if(e.el&&e.st!='dead'&&!isB(e))bjAura(e);
  for(const e of ens)if(e.enr&&isB(e)&&e.st!='dead'){const x=e.x-cam;if(x<-150||x>W+150)continue;const pu=.5+.5*Math.sin(T*.2);X.save();X.globalCompositeOperation='lighter';X.fillStyle='rgba(255,50,20,'+(.12+.1*pu)+')';X.beginPath();X.ellipse(x,LY-e.z,90,18,0,0,7);X.fill();X.restore()}
  if(p&&BOJ.ch>10&&state=='play'){const k=Math.min(1,BOJ.ch/BJCH),x=p.x-cam,y=LY-p.z;X.save();X.globalCompositeOperation='lighter';X.fillStyle='rgba(255,200,90,'+(.12+.2*k+(k>=1?.12*Math.sin(T*.5):0))+')';X.beginPath();X.ellipse(x,y,26+k*20,6+k*4,0,0,7);X.fill();X.restore()}}catch(er){console.error('bjda',er)}}}
-function bjBadge(e){const x=e.x-cam;if(x<-60||x>W+60)return;let top=e.z+120;try{top=euiTop(e)}catch(er){}const y=LY-top-22,E=BJE[e.el];X.save();X.translate(x,y);
- X.fillStyle='rgba(16,6,2,.75)';X.strokeStyle=E.c;X.lineWidth=2;X.beginPath();X.moveTo(0,-11);X.lineTo(10,0);X.lineTo(0,11);X.lineTo(-10,0);X.closePath();X.fill();X.stroke();X.fillStyle=E.c;X.strokeStyle=E.c;X.lineWidth=1.6;
- if(e.el=='panc'){X.beginPath();X.moveTo(-5,-5);X.lineTo(5,-5);X.lineTo(5,0);X.quadraticCurveTo(5,5,0,7);X.quadraticCurveTo(-5,5,-5,0);X.closePath();X.fill()}
- else if(e.el=='rych'){X.beginPath();X.moveTo(2,-7);X.lineTo(-4,1);X.lineTo(0,1);X.lineTo(-2,7);X.lineTo(4,-1);X.lineTo(0,-1);X.closePath();X.fill()}
- else if(e.el=='vyb'){X.beginPath();X.arc(-1,2,4.5,0,7);X.fill();X.beginPath();X.moveTo(2,-2);X.quadraticCurveTo(5,-6,3,-8);X.stroke();X.fillStyle=T%10<5?'#fff':'#ffd44a';X.beginPath();X.arc(3,-8,1.6,0,7);X.fill()}
- else{X.beginPath();X.moveTo(-6,5);X.lineTo(-5,-6);X.lineTo(-1,0);X.lineTo(1,0);X.lineTo(5,-6);X.lineTo(6,5);X.closePath();X.fill()}
- if(e.el=='panc'&&e.arm>0){for(let i=0;i<3;i++){X.fillStyle=i<e.arm?'#c8d4e8':'rgba(120,120,130,.4)';X.fillRect(14+i*7,-3,5,6)}}
- const near=Math.abs(e.x-p.x)<300;if((e.seen|0)<170||near){X.textAlign='center';X.font='700 11px Georgia';X.lineWidth=3;X.strokeStyle='#120806';const t=(e.el=='zur'&&e.enr?'ZUŘÍCÍ ':'')+BJE[e.el].n;X.strokeText(t,0,-16);X.fillStyle=E.c;X.fillText(t,0,-16)}
- X.restore()}
 {const _f=dFx;dFx=function(){const r=_f.apply(this,arguments);if(TR2||state=='menu')return r;try{
  for(const s of BOJ.sl){const x=s.x-cam,y=LY-s.z,a=s.l/(s.big==2?14:10),R0=s.big?46:32;X.save();X.translate(x,y);X.scale(s.d,1);X.rotate(-.5);X.globalAlpha=Math.max(0,a);X.strokeStyle=s.big==2?'#ff6a4a':'#fff';X.lineWidth=(s.big?5:3)*a+1;X.lineCap='round';X.beginPath();X.arc(-6,0,R0*(1.15-a*.15),-1.1,1.1);X.stroke();X.globalAlpha=Math.max(0,a*.5);X.strokeStyle='#ffe6a0';X.lineWidth=1.5;X.beginPath();X.arc(-10,0,R0*.8,-.9,.9);X.stroke();X.restore()}
  if(BOJ.bl>0){const k=1-BOJ.bl/18,x=BOJ.blx-cam,y=LY-BOJ.blz-40;X.save();X.translate(x,y);X.scale(BOJ.blf,1);X.globalAlpha=1-k;X.strokeStyle='#fff4d0';X.lineWidth=8*(1-k)+1;X.beginPath();X.arc(0,0,40+k*150,-.9,.9);X.stroke();X.strokeStyle='#ffb14a';X.lineWidth=4*(1-k)+1;X.beginPath();X.arc(0,0,26+k*120,-.8,.8);X.stroke();X.restore()}
  if(BOJ.pf>0&&p){const k=BOJ.pf/20,x=p.x-cam+p.face*18,y=LY-p.z-58;X.save();X.globalAlpha=k;X.strokeStyle='#bff4ff';X.lineWidth=4;X.beginPath();X.arc(x,y,24+(1-k)*30,0,7);X.stroke();X.restore()}
  if(BOJ.pa>0&&p&&!(BOJ.pf>0)){const k=BOJ.pa/14,x=p.x-cam+p.face*14,y=LY-p.z-56;X.save();X.globalAlpha=.7*k;X.strokeStyle='#9fe8ff';X.lineWidth=3;X.beginPath();X.arc(x,y,22,p.face>0?-1.1:Math.PI-1.1,p.face>0?1.1:Math.PI+1.1);X.stroke();X.restore()}
- for(const e of ens)if(e.el&&e.st!='dead'&&!isB(e))bjBadge(e);
- for(const F of BOJ.fz){const e=F.e;if(!e)continue;const x=e.x-cam,y=LY-e.z-30,on=(F.t>>2)%2==0||F.t<14;X.save();X.globalCompositeOperation='lighter';X.fillStyle='rgba(255,'+(on?80:160)+',40,'+(on?.55:.25)+')';X.beginPath();X.arc(x,y,18+(48-F.t)*.5,0,7);X.fill();X.restore();X.save();X.textAlign='center';X.font='700 16px Georgia';X.lineWidth=3;X.strokeStyle='#120806';X.strokeText('!',x,y-34);X.fillStyle=on?'#ff5a3a':'#ffd44a';X.fillText('!',x,y-34);X.restore()}
- if(bjOn()){let xe=null,xd=261;for(const e of ens){if(!bjCanX(e)||Math.abs(e.z-p.z)>90)continue;const d=Math.abs(e.x-p.x);if(d<xd){xd=d;xe=e}}for(const e of xe?[xe]:[]){let top=e.z+120;try{top=euiTop(e)}catch(er){}const x=e.x-cam,y=LY-top-(e.el?52:26)+Math.sin(T*.25)*2,t=bjK('attack')+' POPRAVA';X.save();X.textAlign='center';X.font='700 13px Georgia';X.lineWidth=4;X.strokeStyle='#120806';X.strokeText(t,x,y);X.fillStyle=T%20<10?'#ff5a3a':'#ffd0c0';X.fillText(t,x,y);X.restore()}
+ if(bjOn()){
   const c=bjNearChest(),b=bjNearBell(),t=c?bjK('interact')+' Otevřít truhlu':b?bjK('interact')+' Rozezvonit zvon výzvy':null;if(t){const o=c||b,x=o.x-cam,y=LY-o.z-(c?52:140);X.save();X.textAlign='center';X.font='700 14px Georgia';X.lineWidth=4;X.strokeStyle='#120806';X.strokeText(t,x,y);X.fillStyle='#ffe28a';X.fillText(t,x,y);X.restore()}}
  }catch(er){console.error('bjfx',er)}return r}}
 {const _l=lighting;lighting=function(){_l();if(TR2||state=='menu'||!lv||!lv.dark)return;try{X.save();X.translate(0,camZ);X.globalCompositeOperation='lighter';
  for(const c of BOJ.chs){if(c.op)continue;const x=c.x-cam,y=LY-c.z-14;if(x<-80||x>W+80)continue;const G=X.createRadialGradient(x,y,2,x,y,46);G.addColorStop(0,'rgba(255,210,110,'+(.28+.12*Math.sin(T*.08+c.i))+')');G.addColorStop(1,'rgba(255,200,90,0)');X.fillStyle=G;X.fillRect(x-46,y-46,92,92)}
- for(const e of ens){if(!e.el||e.st=='dead')continue;const x=e.x-cam,y=LY-e.z-4;if(x<-60||x>W+60)continue;const G=X.createRadialGradient(x,y,2,x,y,40);G.addColorStop(0,'rgba('+BJE[e.el].r+',.35)');G.addColorStop(1,'rgba('+BJE[e.el].r+',0)');X.fillStyle=G;X.fillRect(x-40,y-40,80,80)}
  X.restore()}catch(er){console.error('bjl',er)}}}
 
 /* ---------- HUD ---------- */
@@ -273,17 +222,13 @@ function bjBellHud(){const b=BOJ.bell;if(!b||b.st!=1)return;const left=Math.max(
  X.fillStyle='rgba(16,6,2,.7)';X.beginPath();X.roundRect(x,y,w,40,10);X.fill();X.strokeStyle=s<=10&&T%30<15?'#ff5a3a':'rgba(232,184,96,.5)';X.lineWidth=1.5;X.stroke();
  X.textAlign='left';X.font='15px '+FONT;X.fillStyle='#ffd27a';X.fillText('ZVON VÝZVY',x+12,y+18);X.font='700 12px Georgia';X.fillStyle='#e9d3a4';X.fillText('vlna '+b.w+'/2  •  zbývá '+alive,x+12,y+33);
  X.textAlign='right';X.font='22px '+FONT;X.fillStyle=s<=10?'#ff6a4a':'#fff3dc';X.fillText('0:'+String(s).padStart(2,'0'),x+w-10,y+27);X.fillStyle='rgba(0,0,0,.5)';X.fillRect(x+10,y+36,w-20,3);X.fillStyle=s<=10?'#ff6a4a':'#ffb14a';X.fillRect(x+10,y+36,(w-20)*left/b.T,3);X.restore()}
-function bjTipDraw(){const t=BOJ.tip;if(!t||state!='play')return;const a=Math.max(0,Math.min(1,t.t/12,(360-t.t)/18));if(a<=0)return;X.save();X.globalAlpha=a;X.font='13.5px Georgia';const L=wrapL(t.tx,620).slice(0,2),w=Math.min(720,Math.max(...L.map(l=>X.measureText(l).width))+92),h=L.length>1?50:34;
- const x=W/2-w/2,y=(bossE&&bossE.st!='dead'?58:8)-(1-a)*10;
- X.fillStyle='rgba(20,8,4,.82)';X.beginPath();X.roundRect(x,y,w,h,10);X.fill();X.strokeStyle='#e8b860';X.lineWidth=1.5;X.stroke();X.fillStyle='#e8b860';X.beginPath();X.roundRect(x+8,y+h/2-10,46,20,10);X.fill();
- X.textAlign='center';X.font='700 11px Georgia';X.fillStyle='#2a1206';X.fillText('TIP',x+31,y+h/2+4);X.textAlign='left';X.font='13.5px Georgia';X.fillStyle='#f4e2bc';L.forEach((l,i)=>X.fillText(l,x+66,y+(L.length>1?21+i*17:22)));X.restore()}
 function bjBanDraw(){const b=BOJ.ban;if(!b)return;const t=b.t,a=Math.max(0,Math.min(1,t/8,(150-t)/20)),k=t<12?1+(1-t/12)*1.2:1;X.save();X.globalAlpha=a;X.translate(W/2,H*.36);X.scale(k,k);X.textAlign='center';
  X.font='52px '+FONT;X.lineWidth=8;X.lineJoin='round';X.strokeStyle='#1a0804';X.strokeText(b.tx,0,0);X.fillStyle=b.tx.startsWith('ZUŘ')?'#ff4a2a':b.tx.startsWith('ČAS')?'#c8c8d0':'#ffd44a';X.fillText(b.tx,0,0);
  X.font='italic 17px Georgia';X.lineWidth=4;X.strokeText(b.sub,0,28);X.fillStyle='#f4e2bc';X.fillText(b.sub,0,28);X.restore()}
 function bjHud(){
  if(state=='play'&&p&&!p.dead&&p.hp>0&&p.hp<=Math.max(1,Math.floor(p.mx*.25))){const pu=.5+.5*Math.sin(T*.116);X.save();X.globalAlpha=.22+.2*pu;X.drawImage(bjVig(),0,0,W,H);X.restore()}
  if(BOJ.flash>0){X.save();X.fillStyle='rgba('+BOJ.fc+','+(BOJ.flash/12*.22)+')';X.fillRect(0,0,W,H);X.restore()}
- bjMeter();if(state=='play'){bjBellHud();bjBanDraw();bjTipDraw()}}
+ bjMeter();if(state=='play'){bjBellHud();bjBanDraw()}}
 {const _hx=hudX;hudX=function(){const pl=state=='play'&&!TR2,n=CMB.n;if(pl)CMB.n=0;try{_hx()}finally{if(pl)CMB.n=n}if(!TR2)try{bjHud()}catch(er){console.error('bjh',er)}}}
 
 /* ---------- výkon: automatická kvalita ---------- */
@@ -298,8 +243,7 @@ function bjHud(){
 try{ACTS.forEach(a=>{if(a[0]=='heavy')a[1]='Výmet (podrž = nabitý úder)';if(a[0]=='crouch')a[1]='Krýt se / protiútok'})}catch(e){}
 
 /* ---------- Deník: nové úspěchy, karta TAHY ---------- */
-ACH2.push(['elit','Lovec elit',n=>'Zneškodni '+n+' elitních enemigos',()=>bjSV().eli|0,[5,25,80]],
- ['exec','Kat',n=>'Proveď '+n+' '+qPl(n,'popravu','popravy','poprav'),()=>bjSV().exe|0,[5,30,100]],
+ACH2.push(['exec','Kat',n=>'Proveď '+n+' '+qPl(n,'popravu','popravy','poprav'),()=>bjSV().exe|0,[5,30,100]],
  ['parry','Neprůstřelný',n=>'Odraz '+n+' '+qPl(n,'útok','útoky','útoků')+' protiútokem',()=>bjSV().par|0,[5,30,100]],
  ['styl','Stylista',n=>'Dosáhni stylu '+BJR[n]+' ('+BJN[n].toLowerCase()+')',()=>bjSV().smx|0,[3,4,6]],
  ['chest','Hledač pokladů',n=>'Otevři '+n+' '+qPl(n,'truhlu','truhly','truhel'),()=>bjChestN(),[3,7,12]],
@@ -333,8 +277,7 @@ function bjTabMoves(){const C=SV.cls,k=a=>TOUCH?({attack:'ÚTOK',heavy:'VÝMET',
  const x=500;X.fillStyle='rgba(20,8,4,.55)';X.beginPath();X.roundRect(x,100,442,412,12);X.fill();X.strokeStyle='rgba(232,184,96,.4)';X.stroke();X.font='17px '+FONT;X.fillStyle='#ffd27a';X.fillText('STYL',x+16,126);
  BJR.forEach((r,i)=>{const cx=x+30+i*60;X.textAlign='center';X.font=(i>=5?20:24)+'px '+FONT;X.fillStyle=BJC[i];X.fillText(r,cx,158);X.font='700 8.5px Georgia';X.fillStyle='rgba(233,211,164,.7)';X.fillText(['DRSNÝ','CVALEM','BRAVO','CARAMBA','ŠERIF','SUPER','SRDCE'][i],cx,172)});X.textAlign='left';
  X.font='12px Georgia';X.fillStyle='#e9d3a4';['Styl roste za zásahy – nejvíc za pestrost: nový tah ×1,4.','Stejný tah třikrát po sobě dává jen ×0,3.','Zásah od nepřítele styl srazí, nečinnost ho pomalu bere.','Od A: víc bodů a zlaťáky za každé vyřízení.'].forEach((l,i)=>X.fillText('• '+l,x+16,194+i*17));
- X.font='17px '+FONT;X.fillStyle='#ffd27a';X.fillText('ELITNÍ ENEMIGOS',x+16,282);Object.keys(BJE).forEach((kk,i)=>{const E=BJE[kk],y=304+i*30;X.fillStyle=E.c;X.beginPath();X.moveTo(x+26,y-12);X.lineTo(x+34,y-4);X.lineTo(x+26,y+4);X.lineTo(x+18,y-4);X.closePath();X.fill();X.font='700 12px Georgia';X.fillText(E.n,x+44,y-3);X.font='italic 11px Georgia';X.fillStyle='rgba(233,211,164,.78)';X.fillText(E.d,x+44,y+10)});
- X.font='17px '+FONT;X.fillStyle='#ffd27a';X.fillText('PRŮZKUM',x+16,438);X.font='12px Georgia';X.fillStyle='#e9d3a4';X.fillText('Truhly s pokladem (+30 $): otevřeno '+bjChestN()+'.  Hledej je vysoko na římsách.',x+16,458);X.fillText('Zvony výzvy (+50 $): utišeno '+bjBellN()+'.  Dvě vlny do 45 sekund.',x+16,476);X.fillText('Elitní enemigos poraženo: '+(bjSV().eli|0)+'  •  popravy: '+(bjSV().exe|0)+'  •  protiútoky: '+(bjSV().par|0),x+16,494);
+ X.font='17px '+FONT;X.fillStyle='#ffd27a';X.fillText('PRŮZKUM',x+16,438);X.font='12px Georgia';X.fillStyle='#e9d3a4';X.fillText('Truhly s pokladem (+30 $): otevřeno '+bjChestN()+'.',x+16,458);X.fillText('Zvony výzvy (+50 $): utišeno '+bjBellN()+'.  Dvě vlny do 45 sekund.',x+16,476);X.fillText('Popravy: '+(bjSV().exe|0)+'  •  protiútoky: '+(bjSV().par|0),x+16,494);
  X.restore()}
 {const _a=pgTabAreas;pgTabAreas=function(){_a();try{const i=QM.reg;if(i>SV.un)return;const s=bjSV(),x=300,y=492;X.save();X.textAlign='left';X.font='700 11px Georgia';X.fillStyle='#5a3a1a';X.fillText('TRUHLY',x,y);for(let k=0;k<2;k++){const on=(s.ch[i]>>k&1);X.fillStyle=on?'#c8901e':'rgba(122,82,40,.3)';X.fillRect(x+54+k*16,y-9,12,9);X.strokeStyle='#3a2210';X.lineWidth=1;X.strokeRect(x+54+k*16,y-9,12,9)}
  X.fillStyle='#5a3a1a';X.fillText('ZVON VÝZVY',x+100,y);X.fillStyle=s.bl[i]?'#2a7a2a':'#9a6a3a';X.fillText(s.bl[i]?'utišen ✔':'zatím ne',x+180,y);X.restore()}catch(e){}}}

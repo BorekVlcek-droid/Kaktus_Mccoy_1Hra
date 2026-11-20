@@ -39,8 +39,10 @@ const QD=[
  [['rid',3,10],['free',1,5],['kills',14,5],['seeds',3,10],['time',390,15]],
  [['free',1,5],['combo',20,10],['nohit',1,20],['seeds',3,10],['rank',1,15]]];
 const QMEDAL=20;
-function qTxt(i,k){const q=QD[i][k];return QK[q[0]].t(q[1],i)}
-function qShort(i,k){const q=QD[i][k];return QK[q[0]].s(q[1],i)}
+/* v91: úkoly jsou skryté, dokud je nesplníš */
+function qKnown(i,k){try{if(qDoneEver(i,k))return true;const q=LS&&LS.q;return !!(q&&q.i==i&&q.dn[k])}catch(e){return false}}
+function qTxt(i,k){if(!qKnown(i,k))return k==0?'Skrytá výzva':'Skrytá zakázka';const q=QD[i][k];return QK[q[0]].t(q[1],i)}
+function qShort(i,k){if(!qKnown(i,k))return'???';const q=QD[i][k];return QK[q[0]].s(q[1],i)}
 /* ---------- uložené stavy ---------- */
 function qSV(){if(!SV.qd)SV.qd={};if(!SV.qb)SV.qb={};if(!SV.qm)SV.qm={}}
 function qMask(i){qSV();return SV.qd[i]|0}
@@ -78,7 +80,7 @@ function qTick(){if(!qPlay())return;const q=LS.q,i=q.i,c=q.c;
  if(deco.some(d=>d.k=='sl'&&d.al==200))c.alarm++;
  if(bossE&&bossE.st!='dead'&&!(bI>0))q.bossT++;
  QD[i].forEach((d,k)=>{const K=QK[d[0]];if(q.dn[k]||q.fl[k])return;const v=qVal(i,k);
-  if(v!=QS.ui.lv[k]){if(!K.end&&!K.fail&&v>QS.ui.lv[k]&&!qDoneEver(i,k)){QS.ui.fl[k]=Math.max(QS.ui.fl[k],36);if(QS.ui.lv[k]>0||v>0)QS.ui.exp=Math.max(QS.ui.exp,150)}QS.ui.lv[k]=v}
+  if(v!=QS.ui.lv[k])QS.ui.lv[k]=v;
   if(qDoneEver(i,k))return;
   switch(d[0]){case'time':if(v>d[1])qFail(k);return;case'nohit':if(v>0)qFail(k);return;case'noalarm':if(v>0)qFail(k);return;case'rank':return;
    case'bossnohit':if(v>d[1])qFail(k);else if(bossE&&bossE.st=='dead'&&isB(bossE))qComplete(k);return}

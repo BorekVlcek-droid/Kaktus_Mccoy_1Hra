@@ -227,7 +227,7 @@ CUTX.board=c=>{const t=c.t;fade=Math.max(0,1-t/22);SEA.off+=SEA.spd;
    ens.filter(e=>Math.abs(e.x-p.x)<700&&e.st!='dead').forEach((e,i)=>setTimeout(()=>{try{pop(e.x,LY,e.z+140,'!','#ff8a5a')}catch(err){}},120+i*90))}}
  else{const u=t-c.ld;p.vx=0;p.cr=u<16?1:0;p.ld=Math.max(0,12-u);if(u==26)p.face=-1;if(u==44)p.face=1;
   if(u==20)c2Sub('PAQUITO','¡Santa María! Kaktus padá z nebe!',80);if(u==56){c2Sub('KAKTUS','Pardon, že ruším. Kdo tady velí?');c2Fid(C2HERO[SV.cls])}if(u==96)c2Sub('PAQUITO','Teď nikdo. Kapitán skočil do moře, když v mlze uviděl Černou vdovu…',100);
-  if(u==150){try{say(hn[0].t);hn[0].d=1}catch(err){}}if(u>=160){B1C.z=B1C.zt=1;state='play';cut=null;return}}
+  if(u>=160){B1C.z=B1C.zt=1;state='play';cut=null;return}}
  const f=c.ld?c2Path([[c.ld,p.x,p.z+80,1.5],[c.ld+50,p.x+20,p.z+90,1.42],[c.ld+96,p.x-60,p.z+90,1.3],[c.ld+160,p.x+120,p.z+80,1.0]],t):[p.x,Math.max(p.z+40,200),c2L(1.05,1.35,c2S(p.z,700,150))];c2Look(f[0],f[1],f[2])};
 /* =====================================================================
    BAŽINA – příjezd lodí (obal: mlha, světlušky, záběry admirála, skok)

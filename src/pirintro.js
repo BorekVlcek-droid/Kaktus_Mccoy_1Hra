@@ -75,7 +75,7 @@ BPS.cap={dur:664,
   /* ---- 8) Kaktus, pohled na dělo ---- */
   else if(t<548){if(t==470){B1C.zt=1.18;sfx('whoosh',p.x)}bpPose(q,(t>500&&t<540)?'laugh':'idle',40);if(t==476)b1Sub('KAKTUS','Hora svalů… Až se omámí, je můj. A to dělo se taky hodí!',96);if(t==505)B1C.zt=1.1}
   /* ---- 9) roztočí lano, řev ---- */
-  else{if(t==548){B1C.zt=1;B1C.vigT=0;b1Sub('','Býčí útok → vyskoč na paletu. Hvězdičky nad hlavou → mlať ho! Dělo [E] ho srazí k zemi.',150)}
+  else{if(t==548){B1C.zt=1;B1C.vigT=0;}
    if(t<596){bpPose(q,'twirl',60);if(t%10==0)sfx('whoosh',q.x)}else{bpPose(q,'roar',Math.max(0,110-(t-590)*1.6));if(t==620){sfx('roar',q.x);sfx('vCap',q.x);shake=8;cpSay(q,'¡A pelear!')}}}
   /* volné lano po puštění: tlumené kyvadlo */
   if(c.fr){const f=c.fr;f.va+=-.0065*Math.sin(f.a);f.va*=.985;f.a+=f.va}
