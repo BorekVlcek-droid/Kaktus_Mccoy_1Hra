@@ -460,3 +460,12 @@ addEventListener('pointerdown',()=>{try{if(trHoldB())TR2.go=1}catch(e){}});
 /* v94: v ukázkách hry v traileru (a v závěru) žádné vyskakující texty */
 {const _p=pop;pop=function(){const n=txt.length,r=_p.apply(this,arguments);if(TR2&&txt.length>n)txt.length=n;return r}}
 {const _w=trWarnDraw;trWarnDraw=function(){if(TR2)return;return _w.apply(this,arguments)}}
+
+/* v95: enemigos ve hře nemluví – žádné bubliny, pokřiky ani hlášky (civilisté a scény mluví dál) */
+function enMute(){return !cut&&state!='cut'&&state!='cin'}
+{const _s=ebSay;ebSay=function(e,txt,l,o){if(!(o&&o.civ)&&!(e&&e.civ)&&enMute())return;return _s.apply(this,arguments)}}
+{const _s=bSay;bSay=function(e,txt,l,pr){if(enMute())return;return _s.apply(this,arguments)}}
+{const _s=vnSay;vnSay=function(q,txt,l){if(enMute())return;return _s.apply(this,arguments)}}
+const ENSH=new Set(['Harr!','Hehehe!','Z kabiny!']);
+{const _p=pop;pop=function(x,y,z,t,c){if(typeof t=='string'&&enMute()&&(/^…?¡/.test(t)||ENSH.has(t)))return;return _p.apply(this,arguments)}}
+LHK.push(()=>{if(enMute()&&EBUB.length)EBUB=EBUB.filter(b=>b.civ||(b.e&&b.e.civ))});
