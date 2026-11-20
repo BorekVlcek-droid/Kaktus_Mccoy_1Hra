@@ -1640,7 +1640,7 @@ function dAch(){bgOld&&lv&&0;const g=X.createLinearGradient(0,0,0,H);g.addColorS
 const GPM={jump:[0],attack:[2],heavy:[3],ranged:[4],special:[5],dash:[7],interact:[1],crouch:[6]};
 function pollGP(){if(typeof navigator=='undefined'||!navigator.getGamepads)return;const g=[...navigator.getGamepads()].find(x=>x&&x.connected);const now={};if(g){const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed);for(const a in GPM)now[a]=GPM[a].some(b);const ax=g.axes[0]||0,ay=g.axes[1]||0;now.left=ax<-.4||b(14);now.right=ax>.4||b(15);now.up=ay<-.55||b(12);now.down=ay>.55||b(13);now.start=b(9);now.back=b(8)}
  for(const a in now){if(now[a]&&!GPV[a]){GAP[a]=1;const m=state=='play'?{start:'Escape',back:'KeyP'}[a]:{up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight',jump:'Enter',attack:'Enter',interact:'Escape',start:'Escape'}[a];if(m){P[m]=1;auKick()}}}for(const a in GA)GA[a]=0;Object.assign(GA,now);GPV=now}
-addEventListener('gamepadconnected',()=>{TOA.push({a:['gp','Ovladač připojen','A skok • X útok • Y těžký • B akce • LB/RB schopnosti'],t:0})});
+
 function tryGrab(){if(carry)return false;const e=ens.find(o=>o.st!='dead'&&!isB(o)&&!AN[o.t]&&(o.stn>0||o.net>0)&&Math.abs(o.x-p.x)<50&&Math.abs(o.z-p.z)<40);if(!e)return false;carry=e;e.st='held';e.stn=0;e.net=0;e.kb=0;sfx('grab');pop(p.x,LY,p.z+125,'ZVEDNUT!','#ffd44a');return true}
 function updCarry(){if(!carry)return;const e=carry;if(e.st!='held'||p.dead||p.climb||p.hang){if(e.st=='held'){e.st='alert';e.tm=20}carry=null;return}e.x=p.x+p.face*36;e.z=p.z+74;e.vz=0;e.face=p.face;
  if(kp('attack')||kp('heavy')){carry=null;e.st='thrown';e.kb=p.face*13;e.vz=3.2;e.z=p.z+40;e.x=p.x+p.face*26;sfx('whoosh');for(const c of[...(SV.keys.attack||[]),...(SV.keys.heavy||[])])delete P[c];GAP.attack=GAP.heavy=0}}
@@ -6519,7 +6519,8 @@ function mapMouse(x,y,c){MX=x;MY=y;if(MAP.ov){if(c){MAP.ov=null;sfx('uiok')}retu
 /* ===== mapa i po „Hrát/Pokračovat“ a po nové hře; řidší rozmístění enemigos ===== */
 {const _ac=act;act=function(i){const it=MI()[i];if(state=='menu'&&mn.sub==0&&it=='Pokračovat'){sfx('uiok');MFL=10;openMap(SV.un);return}return _ac(i)}}
 {const _md=mDesc;mDesc=function(it){if(it=='Pokračovat')return'Otevři mapu – na řadě je kapitola '+(SV.un+1)+': '+LV[SV.un].n+'.';if(it=='Výběr oblasti')return'Mapa světa: vyber kteroukoli odemčenou oblast a podívej se na výzvy.';return _md(it)}}
-{const _ps=playStory;playStory=function(done){return _ps(()=>{SV.mapSeen=0;openMap(0)})}}
+/* v93: po výběru postavy už se nepřehrává příběhový trailer – rovnou mapa */
+playStory=function(done){for(const k in K)K[k]=0;SV.mapSeen=0;saveSV();openMap(0)};
 /* řidší nepřátelé: v hloučcích nechá jen jednoho, z ostatních vynechá každého pátého */
 const ENGAP=170;
 {const _sd=spawnDesign;spawnDesign=function(E){if(lv&&lv.k!='sea'){const H=E.filter(q=>!AN[q[0]]&&!(q[3]&&q[3].keep)).sort((a,b)=>a[1]-b[1]),drop=new Set();let lx=-1e9,n=0;

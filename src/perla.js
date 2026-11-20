@@ -181,7 +181,7 @@ function pnShipPos(){return{x:700-cam*.32+Math.sin(T*.004)*24,y:GY+50+Math.sin(T
 function pnFreeX(){const nz=PNZ.filter(z=>z[1]>p.x-520&&z[0]<p.x+520);for(let k=0;k<20;k++){const L=nz.length&&k<12?nz:PNZ,Z=L[(Math.random()*L.length)|0],x=Math.round(R(Z[0],Z[1]));if(!PN.boats.some(b=>!b.gone&&Math.abs(b.tx-x)<160)&&Math.abs(x-p.x)>90)return x}return 700}
 function pnLaunch(n,el,o){o=o||{};const i=PN.boats.filter(b=>b.st=='lower').length?1-(PN.last%2):PN.last%2;PN.last++;const b={st:'lower',t:0,i,n,el:el||0,tx:o.tx||pnFreeX(),u:0,seed:(PN.seed++)%4,cap:o.cap||0,boss:o.boss||0,row:1,sp:o.cap?1/300:1/([240,200,165][SV.dif]||200),hooks:0,cl:0};PNS.hang[i]=0;PN.boats.push(b);
  sfx('pnWood');if(!o.cap&&!o.quiet)pnAnn(n>=3?'Z Vdovy spouštějí člun – '+n+' piráti!':'Z Vdovy spouštějí člun!');return b}
-function pnAnn(t){PN.ann={t:0,tx:t}}
+function pnAnn(t){}/* v93: bez vyskakovacích hlášení */
 function pnBoatPos(b){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0;if(b.st=='lower'){const k=pkE.io(Math.min(1,b.t/32));return{x:lx,y:S.y-112*s0*(1-k)+2,s:.5*s0,rot:0}}
  const u=pkE.io(pkC(b.u,0,1)),ax=b.tx-cam,ay=LY-37+camZ*.55;return{x:pkL(lx,ax,u),y:pkL(S.y+2,ay,Math.pow(u,1.25))+Math.sin(T*.05+b.seed)*1.5,s:pkL(.42,.95,u),rot:b.st=='sink'?Math.min(.5,b.t*.01):0}}
 function pnBoatDraw(b){const q=pnBoatPos(b);if(b.st=='lower'){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0,ty=S.y-168*s0;X.strokeStyle='rgba(30,24,18,.9)';X.lineWidth=1;X.beginPath();X.moveTo(lx-8*s0,ty);X.lineTo(q.x-14*q.s,q.y-20*q.s);X.moveTo(lx+8*s0,ty);X.lineTo(q.x+14*q.s,q.y-20*q.s);X.stroke()}
@@ -449,3 +449,6 @@ try{const i=EPP.findIndex(a=>a[0]=='adm');if(i>=0)EPP[i][1]='Kapitán Calavera'}
 try{QBOSS[1]='kapitána Calaveru'}catch(e){}
 try{ADQ.parOff=1;ADQ.lost={hat:1,w:1}}catch(e){}
 try{if(typeof ACH2!='undefined'&&!ACH2.some(a=>a[0]=='sunk'))ACH2.push(['sunk','Dělostřelec',n=>'Potop palubním dělem '+n+' '+qPl(n,'člun','čluny','člunů'),()=>pgSV().sunk|0,[2,6,15]])}catch(e){}
+
+/* v93: základní trailer končí před přehlídkou bossů – zůstává jen závěrečná karta KAKTUS */
+{const i=TRB3.findIndex(b=>b.k=='boss'),f=TRB3.find(b=>b.k=='final');if(i>=0)TRB3.splice(i,TRB3.length-i,...(f?[f]:[]))}

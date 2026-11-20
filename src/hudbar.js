@@ -234,7 +234,7 @@ function hbBreak(k){if(!p)return;const f=p.face||1,hx=p.x+f*36,hz=p.z+64,mat=HBM
  if(mat=='m')for(let i=0;i<8;i++)par.push({x:hx,y:LY,z:hz,vx:R(-5,5),vz:R(1,6),l:R(8,14),c:'#fff6c8',s:2});
  /* dvě větší trosky padají na zem */for(let i=0;i<2;i++)HB.deb.push({x:hx,z:hz,vx:f*R(.8,3)*(i?1:-.5),vz:R(4.5,7.5),a:R(0,6),va:R(-.45,.45),k,side:i?1:-1,l:0,on:0});try{ring(hx,LY,26,'rgba(255,250,220,.9)',10,hz)}catch(err){}burst(hx,LY,hz,'#fff6c8');
  const sh=[];for(let i=0;i<10;i++)sh.push({x:R(-4,4),y:R(-8,8),vx:R(-1.4,1.4),vy:R(-1.6,.4),a:R(0,6),s:R(2,4),c:cols[i%cols.length]});HB.brk={k,t:0,sh};HB.brkT=60;
- if(SV.cls!=1&&k.startsWith('cls'))setTimeout(()=>{try{if(state=='play')say('Zbraň je zlomená – bojuješ pěstmi. Oprava za chvíli, nebo hned u vlajky.')}catch(err){}},500)}
+ if(SV.cls!=1&&k.startsWith('cls'))setTimeout(()=>{try{if(state=='play')say('Zbraň je zlomená!')}catch(err){}},500)}
 function hbRepair(why){if(!p||!p.cbrk)return;p.cbrk=0;p.crep=0;p.cdur=CDUR[SV.cls];sfx('hbFix');pop(p.x,LY,p.z+140,why=='cp'?'SPRAVENO U VLAJKY!':(CWN[SV.cls]+' JE ZPÁTKY!').toUpperCase(),'#9fe0ff');
  for(let i=0;i<12;i++)par.push({x:p.x+p.face*30+R(-8,8),y:LY,z:p.z+60+R(-8,8),vx:R(-2,2),vz:R(1,4),l:R(18,30),c:i%2?'#9fe0ff':'#ffffff',s:2.5});HB.fixT=30}
 /* trosky zbraně ve světě */

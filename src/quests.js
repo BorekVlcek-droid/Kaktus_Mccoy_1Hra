@@ -57,7 +57,7 @@ const QS={ban:[],ui:{exp:0,pin:0,fl:[0,0,0,0,0],sh:[0,0,0,0,0],lv:[0,0,0,0,0]},c
 function qNew(i){return{i,c:{kill:0,stealth:0,air:0,boom:0,throw:0,wpn:0,surr:0,alarm:0,coins:0,free:0},dn:[0,0,0,0,0],fl:[0,0,0,0,0],gain:0,lco:-1,lfr:-1,bossT:0}}
 function qOn(){return !!(LS&&LS.q&&!TR2&&lv&&li>=0&&li<QD.length&&LS.q.i==li&&state!='cin')}
 function qPlay(){return qOn()&&state=='play'}
-{const _li=lsInit;lsInit=function(){_li();if(LS&&!TR2&&li>=0&&li<QD.length){LS.q=qNew(li);QS.ui.exp=420;QS.ui.lv=[0,0,0,0,0];QS.ban=[];QFLY.length=0}}}
+{const _li=lsInit;lsInit=function(){_li();if(LS&&!TR2&&li>=0&&li<QD.length){LS.q=qNew(li);QS.ui.exp=0;QS.ui.lv=[0,0,0,0,0];QS.ban=[];QFLY.length=0}}}
 /* hodnota průběhu pro úkol */
 function qVal(i,k){const q=QD[i][k],L=LS,c=L&&L.q?L.q.c:null;if(!c)return 0;switch(q[0]){
  case'kills':return c.kill;case'stealth':return c.stealth;case'air':return c.air;case'boom':return c.boom;case'throw':return c.throw;case'wpn':return c.wpn;case'surr':return c.surr;

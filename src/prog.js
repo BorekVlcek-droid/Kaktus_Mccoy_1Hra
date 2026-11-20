@@ -154,7 +154,7 @@ function pgTrailDraw(t,x,y,a){if(t.k=='jiskry'){X.fillStyle='rgba(255,'+(200+(t.
 {const _dp=dPlayer;dPlayer=function(){try{for(const t of PG.tr){const x=t.x-cam,y=LY-t.z;if(x<-20||x>W+20)continue;pgTrailDraw(t,x,y,Math.max(0,1-t.l/t.L))}}catch(e){}return _dp()}}
 
 /* ======================= OZNÁMENÍ ======================= */
-function pgBan(b){b.t=0;PG.ban.push(b)}
+function pgBan(b){}/* v93: žádné vyskakovací plakety (úspěchy, hvězdy, hodnosti, zakázky) */
 function pgBanDur(b){const q=PG.ban.length;const base=b.k=='star'||b.k=='rank'||b.k=='wnt'?210:b.k=='ach'?170:b.k=='fail'?110:150;return q>3?Math.round(base*.6):base}
 function pgBanTick(){if(state=='cut'||state=='cin'||state=='res'||TR2)return;const b=PG.ban[0];if(b){b.t++;if(b.t==1){if(b.k=='star'){sfx('win');sfx('sparkle');try{synth(()=>{TS.glint(1.1);TS.shimmer(1.2,.5,0,[86,90,93,98])})}catch(e){}}else if(b.k=='rank'||b.k=='wnt'){sfx('win');sfx('heavy')}else if(b.k=='ach'){sfx('flag');sfx('sparkle')}else if(b.k=='zak'){sfx('flag');sfx('coin')}}
   if(b.t>=pgBanDur(b))PG.ban.shift()}

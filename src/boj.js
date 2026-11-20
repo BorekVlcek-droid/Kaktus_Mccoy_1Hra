@@ -37,7 +37,7 @@ function bjCanX(e){return e&&e.st!='dead'&&!isB(e)&&!AN[e.t]&&e.t!='k'&&!e.civ&&
 function bjSty(k,m){if(!bjOn())return;const L=BOJ.mv,b=BJP[k]||5,same=k==BOJ.last&&Math.abs(T-(BOJ.lT|0))<=2;let f=1;
  if(same)f=BOJ.lF||1;else if(L.length>=2&&L[L.length-1]==k&&L[L.length-2]==k){f=.3;BOJ.rep=45;BOJ.nw=0}else if(!L.slice(-4).includes(k)){f=1.4;BOJ.nw=34;BOJ.rep=0}else{BOJ.nw=0;BOJ.rep=0}
  BOJ.v=Math.min(699,BOJ.v+b*f*(m||1)*(1-BOJ.rk*.06));BOJ.idle=0;BOJ.lT=T;BOJ.lF=f;if(!same){L.push(k);if(L.length>8)L.shift()}BOJ.last=k;BOJ.lt=50;bjRank()}
-function bjRank(){const r=Math.max(0,Math.min(6,BOJ.v/100|0));if(r>BOJ.rk){BOJ.rkUp=56;sfx('bjRank');if(r>=3&&p)pop(p.x,LY,p.z+168,BJN[r],BJC[r]);if(r>=1)bjTip('sty');const s=bjSV();if(r>(s.smx|0)){s.smx=r;try{pgAchCheck()}catch(e){}}}BOJ.rk=r}
+function bjRank(){const r=Math.max(0,Math.min(6,BOJ.v/100|0));if(r>BOJ.rk){BOJ.rkUp=56;sfx('bjRank');if(r>=1)bjTip('sty');const s=bjSV();if(r>(s.smx|0)){s.smx=r;try{pgAchCheck()}catch(e){}}}BOJ.rk=r}
 {const _a=addSc;addSc=function(n){return _a(n*(1+BOJ.rk*.2))}}
 
 /* ---------- tipy: v91 vypnuty (hra nevede za ručičku) ---------- */
@@ -86,7 +86,7 @@ function bjBlast(){const C=SV.cls,bm=MEL[C].d*(1+upv('blade')*.3),dmg=bm*3.2,f=p
 /* ---------- zásahy enemigos ---------- */
 function bjKill(e,ctx){if(TR2||!e||e._bk)return;e._bk=1;if(isB(e)||AN[e.t]||e.civ)return;const s=bjSV();
  const left=ens.some(o=>o!=e&&o.st!='dead'&&!AN[o.t]&&!o.civ&&o.st!='pat'&&o.st!='inv'&&o.st!='ride'&&Math.abs(o.x-p.x)<950);
- if(!left&&BOJ.eng>=3&&!(BOJ.kc>0)&&!bossE&&!(BOJ.bell&&BOJ.bell.st==1)){SLO=Math.max(SLO,700);BOJ.kc=70;BOJ.eng=0;sfx('bjKill');pop(e.x,LY,e.z+186,'ČISTO!','#ffe6a0')}}
+ if(!left&&BOJ.eng>=3&&!(BOJ.kc>0)&&!bossE&&!(BOJ.bell&&BOJ.bell.st==1)){SLO=Math.max(SLO,700);BOJ.kc=70;BOJ.eng=0;sfx('bjKill')}}
 {const _h=hurtE;hurtE=function(e,d,dir,la,mel){
  if(!e||TR2||e.st=='dead')return _h.apply(this,arguments);
  const ctx=BOJ.ctx||(mel?'pt':'rng'),hp0=e.hp;
@@ -227,7 +227,7 @@ function bjBanDraw(){const b=BOJ.ban;if(!b)return;const t=b.t,a=Math.max(0,Math.
 function bjHud(){
  if(state=='play'&&p&&!p.dead&&p.hp>0&&p.hp<=Math.max(1,Math.floor(p.mx*.25))){const pu=.5+.5*Math.sin(T*.116);X.save();X.globalAlpha=.22+.2*pu;X.drawImage(bjVig(),0,0,W,H);X.restore()}
  if(BOJ.flash>0){X.save();X.fillStyle='rgba('+BOJ.fc+','+(BOJ.flash/12*.22)+')';X.fillRect(0,0,W,H);X.restore()}
- bjMeter();if(state=='play'){bjBellHud();bjBanDraw()}}
+ bjMeter();if(state=='play')bjBellHud()}/* v93: velké nápisy (ZUŘIVOST!, ZVON…) vypnuty */
 {const _hx=hudX;hudX=function(){const pl=state=='play'&&!TR2,n=CMB.n;if(pl)CMB.n=0;try{_hx()}finally{if(pl)CMB.n=n}if(!TR2)try{bjHud()}catch(er){console.error('bjh',er)}}}
 
 /* ---------- výkon: automatická kvalita ---------- */

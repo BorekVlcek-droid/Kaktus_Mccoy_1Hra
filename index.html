@@ -1640,7 +1640,7 @@ function dAch(){bgOld&&lv&&0;const g=X.createLinearGradient(0,0,0,H);g.addColorS
 const GPM={jump:[0],attack:[2],heavy:[3],ranged:[4],special:[5],dash:[7],interact:[1],crouch:[6]};
 function pollGP(){if(typeof navigator=='undefined'||!navigator.getGamepads)return;const g=[...navigator.getGamepads()].find(x=>x&&x.connected);const now={};if(g){const b=i=>!!(g.buttons[i]&&g.buttons[i].pressed);for(const a in GPM)now[a]=GPM[a].some(b);const ax=g.axes[0]||0,ay=g.axes[1]||0;now.left=ax<-.4||b(14);now.right=ax>.4||b(15);now.up=ay<-.55||b(12);now.down=ay>.55||b(13);now.start=b(9);now.back=b(8)}
  for(const a in now){if(now[a]&&!GPV[a]){GAP[a]=1;const m=state=='play'?{start:'Escape',back:'KeyP'}[a]:{up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight',jump:'Enter',attack:'Enter',interact:'Escape',start:'Escape'}[a];if(m){P[m]=1;auKick()}}}for(const a in GA)GA[a]=0;Object.assign(GA,now);GPV=now}
-addEventListener('gamepadconnected',()=>{TOA.push({a:['gp','Ovladač připojen','A skok • X útok • Y těžký • B akce • LB/RB schopnosti'],t:0})});
+
 function tryGrab(){if(carry)return false;const e=ens.find(o=>o.st!='dead'&&!isB(o)&&!AN[o.t]&&(o.stn>0||o.net>0)&&Math.abs(o.x-p.x)<50&&Math.abs(o.z-p.z)<40);if(!e)return false;carry=e;e.st='held';e.stn=0;e.net=0;e.kb=0;sfx('grab');pop(p.x,LY,p.z+125,'ZVEDNUT!','#ffd44a');return true}
 function updCarry(){if(!carry)return;const e=carry;if(e.st!='held'||p.dead||p.climb||p.hang){if(e.st=='held'){e.st='alert';e.tm=20}carry=null;return}e.x=p.x+p.face*36;e.z=p.z+74;e.vz=0;e.face=p.face;
  if(kp('attack')||kp('heavy')){carry=null;e.st='thrown';e.kb=p.face*13;e.vz=3.2;e.z=p.z+40;e.x=p.x+p.face*26;sfx('whoosh');for(const c of[...(SV.keys.attack||[]),...(SV.keys.heavy||[])])delete P[c];GAP.attack=GAP.heavy=0}}
@@ -6519,7 +6519,8 @@ function mapMouse(x,y,c){MX=x;MY=y;if(MAP.ov){if(c){MAP.ov=null;sfx('uiok')}retu
 /* ===== mapa i po „Hrát/Pokračovat“ a po nové hře; řidší rozmístění enemigos ===== */
 {const _ac=act;act=function(i){const it=MI()[i];if(state=='menu'&&mn.sub==0&&it=='Pokračovat'){sfx('uiok');MFL=10;openMap(SV.un);return}return _ac(i)}}
 {const _md=mDesc;mDesc=function(it){if(it=='Pokračovat')return'Otevři mapu – na řadě je kapitola '+(SV.un+1)+': '+LV[SV.un].n+'.';if(it=='Výběr oblasti')return'Mapa světa: vyber kteroukoli odemčenou oblast a podívej se na výzvy.';return _md(it)}}
-{const _ps=playStory;playStory=function(done){return _ps(()=>{SV.mapSeen=0;openMap(0)})}}
+/* v93: po výběru postavy už se nepřehrává příběhový trailer – rovnou mapa */
+playStory=function(done){for(const k in K)K[k]=0;SV.mapSeen=0;saveSV();openMap(0)};
 /* řidší nepřátelé: v hloučcích nechá jen jednoho, z ostatních vynechá každého pátého */
 const ENGAP=170;
 {const _sd=spawnDesign;spawnDesign=function(E){if(lv&&lv.k!='sea'){const H=E.filter(q=>!AN[q[0]]&&!(q[3]&&q[3].keep)).sort((a,b)=>a[1]-b[1]),drop=new Set();let lx=-1e9,n=0;
@@ -12207,7 +12208,7 @@ const QS={ban:[],ui:{exp:0,pin:0,fl:[0,0,0,0,0],sh:[0,0,0,0,0],lv:[0,0,0,0,0]},c
 function qNew(i){return{i,c:{kill:0,stealth:0,air:0,boom:0,throw:0,wpn:0,surr:0,alarm:0,coins:0,free:0},dn:[0,0,0,0,0],fl:[0,0,0,0,0],gain:0,lco:-1,lfr:-1,bossT:0}}
 function qOn(){return !!(LS&&LS.q&&!TR2&&lv&&li>=0&&li<QD.length&&LS.q.i==li&&state!='cin')}
 function qPlay(){return qOn()&&state=='play'}
-{const _li=lsInit;lsInit=function(){_li();if(LS&&!TR2&&li>=0&&li<QD.length){LS.q=qNew(li);QS.ui.exp=420;QS.ui.lv=[0,0,0,0,0];QS.ban=[];QFLY.length=0}}}
+{const _li=lsInit;lsInit=function(){_li();if(LS&&!TR2&&li>=0&&li<QD.length){LS.q=qNew(li);QS.ui.exp=0;QS.ui.lv=[0,0,0,0,0];QS.ban=[];QFLY.length=0}}}
 /* hodnota průběhu pro úkol */
 function qVal(i,k){const q=QD[i][k],L=LS,c=L&&L.q?L.q.c:null;if(!c)return 0;switch(q[0]){
  case'kills':return c.kill;case'stealth':return c.stealth;case'air':return c.air;case'boom':return c.boom;case'throw':return c.throw;case'wpn':return c.wpn;case'surr':return c.surr;
@@ -13386,7 +13387,7 @@ function hbBreak(k){if(!p)return;const f=p.face||1,hx=p.x+f*36,hz=p.z+64,mat=HBM
  if(mat=='m')for(let i=0;i<8;i++)par.push({x:hx,y:LY,z:hz,vx:R(-5,5),vz:R(1,6),l:R(8,14),c:'#fff6c8',s:2});
  /* dvě větší trosky padají na zem */for(let i=0;i<2;i++)HB.deb.push({x:hx,z:hz,vx:f*R(.8,3)*(i?1:-.5),vz:R(4.5,7.5),a:R(0,6),va:R(-.45,.45),k,side:i?1:-1,l:0,on:0});try{ring(hx,LY,26,'rgba(255,250,220,.9)',10,hz)}catch(err){}burst(hx,LY,hz,'#fff6c8');
  const sh=[];for(let i=0;i<10;i++)sh.push({x:R(-4,4),y:R(-8,8),vx:R(-1.4,1.4),vy:R(-1.6,.4),a:R(0,6),s:R(2,4),c:cols[i%cols.length]});HB.brk={k,t:0,sh};HB.brkT=60;
- if(SV.cls!=1&&k.startsWith('cls'))setTimeout(()=>{try{if(state=='play')say('Zbraň je zlomená – bojuješ pěstmi. Oprava za chvíli, nebo hned u vlajky.')}catch(err){}},500)}
+ if(SV.cls!=1&&k.startsWith('cls'))setTimeout(()=>{try{if(state=='play')say('Zbraň je zlomená!')}catch(err){}},500)}
 function hbRepair(why){if(!p||!p.cbrk)return;p.cbrk=0;p.crep=0;p.cdur=CDUR[SV.cls];sfx('hbFix');pop(p.x,LY,p.z+140,why=='cp'?'SPRAVENO U VLAJKY!':(CWN[SV.cls]+' JE ZPÁTKY!').toUpperCase(),'#9fe0ff');
  for(let i=0;i<12;i++)par.push({x:p.x+p.face*30+R(-8,8),y:LY,z:p.z+60+R(-8,8),vx:R(-2,2),vz:R(1,4),l:R(18,30),c:i%2?'#9fe0ff':'#ffffff',s:2.5});HB.fixT=30}
 /* trosky zbraně ve světě */
@@ -14513,7 +14514,7 @@ function pgTrailDraw(t,x,y,a){if(t.k=='jiskry'){X.fillStyle='rgba(255,'+(200+(t.
 {const _dp=dPlayer;dPlayer=function(){try{for(const t of PG.tr){const x=t.x-cam,y=LY-t.z;if(x<-20||x>W+20)continue;pgTrailDraw(t,x,y,Math.max(0,1-t.l/t.L))}}catch(e){}return _dp()}}
 
 /* ======================= OZNÁMENÍ ======================= */
-function pgBan(b){b.t=0;PG.ban.push(b)}
+function pgBan(b){}/* v93: žádné vyskakovací plakety (úspěchy, hvězdy, hodnosti, zakázky) */
 function pgBanDur(b){const q=PG.ban.length;const base=b.k=='star'||b.k=='rank'||b.k=='wnt'?210:b.k=='ach'?170:b.k=='fail'?110:150;return q>3?Math.round(base*.6):base}
 function pgBanTick(){if(state=='cut'||state=='cin'||state=='res'||TR2)return;const b=PG.ban[0];if(b){b.t++;if(b.t==1){if(b.k=='star'){sfx('win');sfx('sparkle');try{synth(()=>{TS.glint(1.1);TS.shimmer(1.2,.5,0,[86,90,93,98])})}catch(e){}}else if(b.k=='rank'||b.k=='wnt'){sfx('win');sfx('heavy')}else if(b.k=='ach'){sfx('flag');sfx('sparkle')}else if(b.k=='zak'){sfx('flag');sfx('coin')}}
   if(b.t>=pgBanDur(b))PG.ban.shift()}
@@ -14798,7 +14799,7 @@ function bjCanX(e){return e&&e.st!='dead'&&!isB(e)&&!AN[e.t]&&e.t!='k'&&!e.civ&&
 function bjSty(k,m){if(!bjOn())return;const L=BOJ.mv,b=BJP[k]||5,same=k==BOJ.last&&Math.abs(T-(BOJ.lT|0))<=2;let f=1;
  if(same)f=BOJ.lF||1;else if(L.length>=2&&L[L.length-1]==k&&L[L.length-2]==k){f=.3;BOJ.rep=45;BOJ.nw=0}else if(!L.slice(-4).includes(k)){f=1.4;BOJ.nw=34;BOJ.rep=0}else{BOJ.nw=0;BOJ.rep=0}
  BOJ.v=Math.min(699,BOJ.v+b*f*(m||1)*(1-BOJ.rk*.06));BOJ.idle=0;BOJ.lT=T;BOJ.lF=f;if(!same){L.push(k);if(L.length>8)L.shift()}BOJ.last=k;BOJ.lt=50;bjRank()}
-function bjRank(){const r=Math.max(0,Math.min(6,BOJ.v/100|0));if(r>BOJ.rk){BOJ.rkUp=56;sfx('bjRank');if(r>=3&&p)pop(p.x,LY,p.z+168,BJN[r],BJC[r]);if(r>=1)bjTip('sty');const s=bjSV();if(r>(s.smx|0)){s.smx=r;try{pgAchCheck()}catch(e){}}}BOJ.rk=r}
+function bjRank(){const r=Math.max(0,Math.min(6,BOJ.v/100|0));if(r>BOJ.rk){BOJ.rkUp=56;sfx('bjRank');if(r>=1)bjTip('sty');const s=bjSV();if(r>(s.smx|0)){s.smx=r;try{pgAchCheck()}catch(e){}}}BOJ.rk=r}
 {const _a=addSc;addSc=function(n){return _a(n*(1+BOJ.rk*.2))}}
 
 /* ---------- tipy: v91 vypnuty (hra nevede za ručičku) ---------- */
@@ -14847,7 +14848,7 @@ function bjBlast(){const C=SV.cls,bm=MEL[C].d*(1+upv('blade')*.3),dmg=bm*3.2,f=p
 /* ---------- zásahy enemigos ---------- */
 function bjKill(e,ctx){if(TR2||!e||e._bk)return;e._bk=1;if(isB(e)||AN[e.t]||e.civ)return;const s=bjSV();
  const left=ens.some(o=>o!=e&&o.st!='dead'&&!AN[o.t]&&!o.civ&&o.st!='pat'&&o.st!='inv'&&o.st!='ride'&&Math.abs(o.x-p.x)<950);
- if(!left&&BOJ.eng>=3&&!(BOJ.kc>0)&&!bossE&&!(BOJ.bell&&BOJ.bell.st==1)){SLO=Math.max(SLO,700);BOJ.kc=70;BOJ.eng=0;sfx('bjKill');pop(e.x,LY,e.z+186,'ČISTO!','#ffe6a0')}}
+ if(!left&&BOJ.eng>=3&&!(BOJ.kc>0)&&!bossE&&!(BOJ.bell&&BOJ.bell.st==1)){SLO=Math.max(SLO,700);BOJ.kc=70;BOJ.eng=0;sfx('bjKill')}}
 {const _h=hurtE;hurtE=function(e,d,dir,la,mel){
  if(!e||TR2||e.st=='dead')return _h.apply(this,arguments);
  const ctx=BOJ.ctx||(mel?'pt':'rng'),hp0=e.hp;
@@ -14988,7 +14989,7 @@ function bjBanDraw(){const b=BOJ.ban;if(!b)return;const t=b.t,a=Math.max(0,Math.
 function bjHud(){
  if(state=='play'&&p&&!p.dead&&p.hp>0&&p.hp<=Math.max(1,Math.floor(p.mx*.25))){const pu=.5+.5*Math.sin(T*.116);X.save();X.globalAlpha=.22+.2*pu;X.drawImage(bjVig(),0,0,W,H);X.restore()}
  if(BOJ.flash>0){X.save();X.fillStyle='rgba('+BOJ.fc+','+(BOJ.flash/12*.22)+')';X.fillRect(0,0,W,H);X.restore()}
- bjMeter();if(state=='play'){bjBellHud();bjBanDraw()}}
+ bjMeter();if(state=='play')bjBellHud()}/* v93: velké nápisy (ZUŘIVOST!, ZVON…) vypnuty */
 {const _hx=hudX;hudX=function(){const pl=state=='play'&&!TR2,n=CMB.n;if(pl)CMB.n=0;try{_hx()}finally{if(pl)CMB.n=n}if(!TR2)try{bjHud()}catch(er){console.error('bjh',er)}}}
 
 /* ---------- výkon: automatická kvalita ---------- */
@@ -15231,7 +15232,7 @@ function pnShipPos(){return{x:700-cam*.32+Math.sin(T*.004)*24,y:GY+50+Math.sin(T
 function pnFreeX(){const nz=PNZ.filter(z=>z[1]>p.x-520&&z[0]<p.x+520);for(let k=0;k<20;k++){const L=nz.length&&k<12?nz:PNZ,Z=L[(Math.random()*L.length)|0],x=Math.round(R(Z[0],Z[1]));if(!PN.boats.some(b=>!b.gone&&Math.abs(b.tx-x)<160)&&Math.abs(x-p.x)>90)return x}return 700}
 function pnLaunch(n,el,o){o=o||{};const i=PN.boats.filter(b=>b.st=='lower').length?1-(PN.last%2):PN.last%2;PN.last++;const b={st:'lower',t:0,i,n,el:el||0,tx:o.tx||pnFreeX(),u:0,seed:(PN.seed++)%4,cap:o.cap||0,boss:o.boss||0,row:1,sp:o.cap?1/300:1/([240,200,165][SV.dif]||200),hooks:0,cl:0};PNS.hang[i]=0;PN.boats.push(b);
  sfx('pnWood');if(!o.cap&&!o.quiet)pnAnn(n>=3?'Z Vdovy spouštějí člun – '+n+' piráti!':'Z Vdovy spouštějí člun!');return b}
-function pnAnn(t){PN.ann={t:0,tx:t}}
+function pnAnn(t){}/* v93: bez vyskakovacích hlášení */
 function pnBoatPos(b){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0;if(b.st=='lower'){const k=pkE.io(Math.min(1,b.t/32));return{x:lx,y:S.y-112*s0*(1-k)+2,s:.5*s0,rot:0}}
  const u=pkE.io(pkC(b.u,0,1)),ax=b.tx-cam,ay=LY-37+camZ*.55;return{x:pkL(lx,ax,u),y:pkL(S.y+2,ay,Math.pow(u,1.25))+Math.sin(T*.05+b.seed)*1.5,s:pkL(.42,.95,u),rot:b.st=='sink'?Math.min(.5,b.t*.01):0}}
 function pnBoatDraw(b){const q=pnBoatPos(b);if(b.st=='lower'){const S=pnShipPos(),s0=PNS.s,lx=S.x+PNS.dav[b.i]*s0,ty=S.y-168*s0;X.strokeStyle='rgba(30,24,18,.9)';X.lineWidth=1;X.beginPath();X.moveTo(lx-8*s0,ty);X.lineTo(q.x-14*q.s,q.y-20*q.s);X.moveTo(lx+8*s0,ty);X.lineTo(q.x+14*q.s,q.y-20*q.s);X.stroke()}
@@ -15499,6 +15500,9 @@ try{const i=EPP.findIndex(a=>a[0]=='adm');if(i>=0)EPP[i][1]='Kapitán Calavera'}
 try{QBOSS[1]='kapitána Calaveru'}catch(e){}
 try{ADQ.parOff=1;ADQ.lost={hat:1,w:1}}catch(e){}
 try{if(typeof ACH2!='undefined'&&!ACH2.some(a=>a[0]=='sunk'))ACH2.push(['sunk','Dělostřelec',n=>'Potop palubním dělem '+n+' '+qPl(n,'člun','čluny','člunů'),()=>pgSV().sunk|0,[2,6,15]])}catch(e){}
+
+/* v93: základní trailer končí před přehlídkou bossů – zůstává jen závěrečná karta KAKTUS */
+{const i=TRB3.findIndex(b=>b.k=='boss'),f=TRB3.find(b=>b.k=='final');if(i>=0)TRB3.splice(i,TRB3.length-i,...(f?[f]:[]))}
 
 window.__HAS=HAS;
 
