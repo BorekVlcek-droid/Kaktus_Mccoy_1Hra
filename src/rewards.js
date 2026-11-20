@@ -23,7 +23,7 @@ function rwSlots(){const w=rwSV();let s=1;RANKS.forEach((R,i)=>{if(R.slot&&w.cl[
 function talById(id){return TAL.find(t=>t.id==id)}
 function talKey(t){return t.m!=null?'m'+t.m:'r'+t.r}
 function talOwned(id){const t=talById(id);return !!(t&&rwSV().cl[talKey(t)])}
-function talOn(id){return !TR2&&rwSV().eq.includes(id)&&talOwned(id)}
+function talOn(id){return false}/* v92: talismany vypnuty */
 function rwPend(){const w=rwSV(),out=[];for(let i=0;i<QD.length;i++)if(SV.qm&&SV.qm[i]&&!w.cl['m'+i])out.push('m'+i);const ri=rankIdx();for(let i=1;i<=ri;i++)if(!w.cl['r'+i])out.push('r'+i);return out}
 function rwInfo(key){const i=+key.slice(1);if(key[0]=='m'){const t=TAL.find(o=>o.m==i);return{k:'m',i,t,st:QMEDAL,title:'Šerifská hvězda: '+LV[i].n}}const R=RANKS[i],t=R.tal?talById(R.tal):null;return{k:'r',i,t,st:R.st||0,slot:R.slot||0,title:'Hodnost: '+R.n}}
 function rwClaim(key){const w=rwSV();if(w.cl[key])return null;const I=rwInfo(key);w.cl[key]=1;if(I.st)SV.st+=I.st;let eq=0;if(I.t&&w.eq.length<rwSlots()&&!w.eq.includes(I.t.id)){w.eq.push(I.t.id);eq=1}saveSV();I.eq=eq;return I}

@@ -187,10 +187,8 @@ function hbDraw(){HB.vis+=((hbShow()?1:0)-HB.vis)*.2;if(HB.vis<.01||!p||!lv)retu
  X.save();X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.globalCompositeOperation='source-over';X.textBaseline='alphabetic';
  const y0=hbY0(),now=hbNow(),hv=k=>HB.hov==k&&now-HB.mt<4000;X.drawImage(HB.bg,0,y0-14);
  /* restart */{const b=HBB.restart,cf=HB.conf=='restart'&&HB.confT>0;hbCirc(b.x,y0+b.y,b.r,hv('restart'),0,cf);hbIcoRestart(b.x,y0+b.y,hv('restart')?1.08:1,hv('restart')?-((now*.004)%6.283):0)}
- /* mince a body */{const c=SV.st|0;if(HB.cntV==null)HB.cntV=c;if(c>HB.cntV)HB.cntV=Math.min(c,HB.cntV+Math.max(.2,(c-HB.cntV)*.15));else HB.cntV=c;
-  const bo=HB.coinT>0?Math.sin((40-HB.coinT)*.35)*3*(HB.coinT/40):0;hbCoin(68,y0+19-Math.abs(bo),10,HB.coinT>0?(40-HB.coinT)*.32:0);
-  hbTxt(String(Math.floor(HB.cntV)),84,y0+26,"19px 'Rye',Georgia",HB.coinT>0?'#8a5a06':'#3a2210',null,2);
-  const sc=LS?LS.sc|0:0;HB.ptsV+=(sc-HB.ptsV)*.15;if(Math.abs(sc-HB.ptsV)<.5)HB.ptsV=sc;hbTxt('Body',58,y0+46,"700 11px Georgia",'#7a5226');hbTxt(String(Math.round(HB.ptsV)),90,y0+46,"700 13px Georgia",'#3a2210')}
+ /* body (v92: bez zlaťáků) */{const sc=LS?LS.sc|0:0;HB.ptsV+=(sc-HB.ptsV)*.15;if(Math.abs(sc-HB.ptsV)<.5)HB.ptsV=sc;
+  hbTxt('BODY',90,y0+18,"700 11px Georgia",'#7a5226','center');hbTxt(String(Math.round(HB.ptsV)),90,y0+40,"19px 'Rye',Georgia",'#3a2210','center',2)}
  /* portrét, životy, zdraví */hbPortrait(184,y0-8,58);hbLives(254,y0+22);hbHealth(254,y0+30,222,13);
  /* zbraň */hbWeapon(y0);
  /* menu */{const b=HBB.menu,h=hv('menu'),cf=HB.conf=='menu'&&HB.confT>0;X.save();X.translate(b.x+b.w/2,y0+b.y+b.h/2);if(h)X.scale(1.05,1.05);X.fillStyle='rgba(30,14,4,.4)';hbRR(-b.w/2+1.5,-b.h/2+2.5,b.w,b.h,9);X.fill();

@@ -1,6 +1,6 @@
 /* =====================================================================
    v87: PROGRESE 2.0 – nový systém postupu
-   • ZLAŤÁKY ($) = měna (sbírají se v oblastech, platí se schopnosti)
+   • v92: bez zlaťáků, schopností a talismanů – postup = hvězdy, hodnosti, úspěchy, vzhled
    • HVĚZDY 1–3 za oblast: ★ dokončení • ★ všechna semínka • ★ výzva
    • HVĚZDNÁ CESTA: šerifské hodnosti za hvězdy → sloty, zlaťáky, stopy
    • ZAKÁZKY: 3 v každé oblasti za zlaťáky
@@ -12,9 +12,9 @@ const PG={ban:[],fly:[],tr:[],last:null,lastC:null,lastSt:null,init:0,hud:{ek:0}
 const PGSN=['DOKONČENO','SEMÍNKA','VÝZVA'];
 /* ---------- hodnosti (Hvězdná cesta) ---------- */
 const PGR=[{s:0,n:'Tulák',d:'Začátek cesty'},
- {s:3,n:'Pomocník šerifa',c:60},{s:6,n:'Zástupce šerifa',slot:1},{s:9,n:'Šerif',c:120,tr:'jiskry'},
- {s:12,n:'Maršál',slot:1},{s:15,n:'Strážce zákona',c:200,tr:'hvezdy'},{s:18,n:'Legenda Západu',slot:1},
- {s:21,n:'Postrach Barona',c:300},{s:24,n:'Srdce pouště',tal:'stava',tr:'stava',ti:'Srdce pouště'}];
+ {s:3,n:'Pomocník šerifa'},{s:6,n:'Zástupce šerifa'},{s:9,n:'Šerif',tr:'jiskry'},
+ {s:12,n:'Maršál'},{s:15,n:'Strážce zákona',tr:'hvezdy'},{s:18,n:'Legenda Západu'},
+ {s:21,n:'Postrach Barona'},{s:24,n:'Srdce pouště',tr:'stava',ti:'Srdce pouště'}];
 /* ---------- hledaní bandité ---------- */
 const WNT=[{n:'Pepe „Zub“ Vargas',tal:'zub'},{n:'Nacho „Čas“ Leal',tal:'hodinky'},{n:'Chuy „Šála“ Vega',tal:'satek'},{n:'Toro „Bum“ Ríos',tal:'rozbuska'},
  {n:'Paco „Pěst“ Díaz',tal:'boxer'},{n:'Beto „Kůže“ Sanz',tal:'vesta'},{n:'Rico „Kopyto“ Paz',tal:'podkova'},{n:'Gordo „Srdce“ Ruiz',tal:'srdce'}];
@@ -22,7 +22,7 @@ const WNT=[{n:'Pepe „Zub“ Vargas',tal:'zub'},{n:'Nacho „Čas“ Leal',tal:
 const PGTR={zadna:{n:'Žádná stopa',d:'Čistý prach pod botami.'},jiskry:{n:'Jiskry',d:'Za hodnost Šerif'},hvezdy:{n:'Hvězdný prach',d:'Za hodnost Strážce zákona'},
  ohen:{n:'Žhavé uhlíky',d:'Úspěch Pyrotechnik (zlato)'},kvety:{n:'Okvětní lístky',d:'Úspěch Zahradník (zlato)'},kour:{n:'Stínový kouř',d:'Úspěch Stín (zlato)'},
  noty:{n:'Noty',d:'Úspěch Mistr komba (zlato)'},zlato:{n:'Zlaťáky',d:'Úspěch Boháč (zlato)'},stava:{n:'Šťáva Srdce',d:'Za hodnost Srdce pouště'}};
-const PGTK=Object.keys(PGTR);
+const PGTK=Object.keys(PGTR).filter(k=>k!='zlato');
 /* ---------- úspěchy: [id, název, popis(n), statistika, [bronz, stříbro, zlato], zlatá kosmetika] ---------- */
 const ACH2=[
  ['kill','Postrach prérie',n=>'Zneškodni '+n+' enemigos',()=>SV.tk|0,[50,250,1000]],
@@ -33,14 +33,12 @@ const ACH2=[
  ['seed','Zahradník',n=>'Najdi '+n+' semínek Srdce',()=>seedTotal(),[3,12,24],'kvety'],
  ['wnt','Lovec lebek',n=>'Dopadni '+n+' '+qPl(n,'hledaného banditu','hledané bandity','hledaných banditů'),()=>pgWantedN(),[1,4,8]],
  ['zak','Pravá ruka šerifa',n=>'Splň '+n+' zakázek',()=>pgZakN(),[5,12,24]],
- ['earn','Boháč',n=>'Vydělej celkem '+n+' zlaťáků',()=>pgSV().earn|0,[200,800,2000],'zlato'],
  ['boom','Pyrotechnik',n=>'Vyhoď do vzduchu '+n+' enemigos',()=>pgSV().boom|0,[10,40,120],'ohen'],
  ['air','Akrobat',n=>'Zneškodni '+n+' enemigos útokem ze vzduchu',()=>pgSV().air|0,[10,50,150]],
  ['thr','Silák',n=>'Hoď enemigem do jiného '+n+'×',()=>pgSV().thr|0,[3,15,40]],
  ['nohit','Nedotknutelný',n=>'Dokonči '+n+' '+qPl(n,'oblast','oblasti','oblastí')+' bez zranění',()=>pgBits(pgSV().nh),[1,3,6]],
  ['rankS','Hodnocení S',n=>'Získej hodnocení S v '+n+' '+qPl(n,'oblasti','oblastech','oblastech'),()=>pgRankS(),[1,4,8]],
  ['cls','Všestranný',n=>'Dokonči oblast s '+n+' '+qPl(n,'postavou','postavami','postavami'),()=>Object.keys(SV.cu||{}).length,[1,2,4]],
- ['up','Kovář',n=>'Kup '+n+' vylepšení schopností',()=>Object.values(SV.up||{}).reduce((a,b)=>a+b,0),[3,9,18]],
  ['end','Srdce zachráněno',n=>['Dokonči příběh','Dokonči příběh na normální obtížnost','Dokonči příběh na těžkou obtížnost'][n-1],()=>pgSV().endD==null?0:(pgSV().endD|0)+1,[1,2,3]]];
 const ACHT=['BRONZ','STŘÍBRO','ZLATO'],ACHC=['#c8803a','#c8ccd4','#ffd44a'],ACHR=[25,60,150];
 /* ---------- výzva (★3) a zakázky: nové řádky QD ze starých úkolů ---------- */
@@ -50,7 +48,7 @@ for(let i=0;i<QD.length;i++){const o=QD_OLD[i];QD[i]=[o[PGCH[i]].slice(),...PGZK
 QK.coins.t=n=>'Posbírej '+n+' zlaťáků';QK.coins.s=n=>'Zlaťáky';
 /* ---------- uložení ---------- */
 function pgSV(){if(!SV.ps){let o=null;try{o=JSON.parse(localStorage.getItem('kaktus_asasin')||'null')}catch(e){}SV.ps=o&&o.ps&&typeof o.ps=='object'?o.ps:{}}
- const s=SV.ps;['s','z','w','a','tal','own'].forEach(k=>{if(!s[k]||typeof s[k]!='object')s[k]={}});if(!Array.isArray(s.eq))s.eq=[];if(!s.c)s.c={tr:'zadna',ti:''};if(s.rk==null)s.rk=0;
+ const s=SV.ps;['s','z','w','a','tal','own'].forEach(k=>{if(!s[k]||typeof s[k]!='object')s[k]={}});if(!Array.isArray(s.eq))s.eq=[];if(!s.c)s.c={tr:'zadna',ti:''};if(s.c.tr=='zlato')s.c.tr='zadna';if(s.rk==null)s.rk=0;
  if(!s.mig){s.mig=1;pgMigrate(s)}return s}
 function pgMigrate(s){try{for(let i=0;i<LV.length;i++){let m=0;if((SV.best&&SV.best[i])||i<SV.un)m|=1;if(seedCount(i)>=3)m|=2;const om=SV.qd?SV.qd[i]|0:0;if(om>>PGCH[i]&1)m|=4;let z=0;PGZK[i].forEach((k,j)=>{if(om>>k&1)z|=1<<j});if(m)s.s[i]=m;if(z)s.z[i]=z}
   const w=SV.rw;if(w&&w.cl)TAL.forEach(t=>{if(w.cl[talKey(t)])s.tal[t.id]=1});if(w&&w.eq)s.eq=w.eq.filter(id=>s.tal[id]);
@@ -66,7 +64,7 @@ function pgWantedN(){return Object.keys(pgSV().w).length}
 function pgRankS(){let n=0;for(let i=0;i<LV.length;i++)if(SV.best&&SV.best[i]&&SV.best[i].r=='S')n++;return n}
 function pgRankIdx(st){st=st==null?pgStars():st;let r=0;PGR.forEach((R,i)=>{if(st>=R.s)r=i});return r}
 function pgSlots(){let n=1;const rk=pgSV().rk|0;for(let i=1;i<=rk;i++)if(PGR[i].slot)n+=PGR[i].slot;return n}
-function pgCoins(n,x,y){if(!n)return;SV.st+=n;pgFlyCoins(Math.min(14,4+(n/10|0)),x,y)}
+function pgCoins(){}/* v92: bez zlaťáků */
 /* nová hra: kampaň od nuly, úspěchy a jejich odměny zůstávají */
 {const _d=cs3Do;cs3Do=function(){if(cs.mode=='new'){const s=pgSV();s.s={};s.z={};s.w={};s.tal={};s.eq=[];s.rk=0;s.nh=0;SV.sd={};SV.best={};const tr=s.c.tr;if(['jiskry','hvezdy','stava'].includes(tr))s.c.tr='zadna';saveSV()}return _d()}}
 
@@ -86,7 +84,7 @@ qCount=function(i){let n=0;for(let j=0;j<3;j++)if(pgZk(i,j))n++;return n};
 qTotal=function(){return pgZakN()};
 qComplete=function(k,why){const q=LS&&LS.q;if(!q||q.dn[k])return;q.dn[k]=1;const i=q.i;if(qDoneEver(i,k))return;QS.ui.fl[k]=60;QS.ui.exp=Math.max(QS.ui.exp,260);
  if(k==0){q.nw=(q.nw||0)|1;pgStar(i,2);return}
- const s=pgSV();s.z[i]=(s.z[i]|0)|1<<(k-1);const rew=QD[i][k][2];q.gain=(q.gain||0)+rew;q.nw=(q.nw||0)|1<<k;pgCoins(rew,W/2,140);saveSV();PG.nw++;pgBan({k:'zak',i,q:k,rew});pgAchCheck()};
+ const s=pgSV();s.z[i]=(s.z[i]|0)|1<<(k-1);q.nw=(q.nw||0)|1<<k;addSc(300);saveSV();PG.nw++;pgBan({k:'zak',i,q:k});pgAchCheck()};
 qFail=function(k){const q=LS&&LS.q;if(!q||q.fl[k]||q.dn[k]||qDoneEver(q.i,k))return;q.fl[k]=1};/* v91: zmaření je tiché – úkoly jsou skryté */
 /* semínka: +10 $ a při třetím ★ */
 {const _s=seedUpd;seedUpd=function(){const n0=TR2?0:seedCount(li);_s();if(!TR2&&lv&&seedCount(li)>n0&&seedCount(li)>=3)pgStar(li,1)}}
@@ -102,8 +100,8 @@ function pgMakeCT(e){const nm=BN[(Math.random()*BN.length)|0];e.bty=nm;e.hp=Math
 /* v91: hledaný bandita se neohlašuje – je to jeden z enemigos v oblasti; kdo to byl, se ukáže až po dopadení */
 const PGWH={e:null,ask:0,done:0,wt:0};
 function pgWantedAuto(){if(TR2||!lv||li<0||li>=WNT.length||!p)return;const s=pgSV(),H=PGWH,Wn=WNT[li];if(s.w[li]||H.done)return;
- if(H.e){if(H.e.st=='dead'){H.done=1;addSc(500);pgCoins(60,W/2,150);s.w[li]=1;s.tal[Wn.tal]=1;if(s.eq.length<pgSlots()&&!s.eq.includes(Wn.tal))s.eq.push(Wn.tal);saveSV();PG.nw++;
-   pgBan({k:'wnt',i:li,rew:60,tal:Wn.tal,n:Wn.n});pop(H.e.x,LY,H.e.z+150,'HLEDANÝ DOPADEN! +60 $','#ffd44a');pgAchCheck()}
+ if(H.e){if(H.e.st=='dead'){H.done=1;addSc(500);s.w[li]=1;saveSV();PG.nw++;
+   pgBan({k:'wnt',i:li,n:Wn.n});pop(H.e.x,LY,H.e.z+150,'HLEDANÝ DOPADEN!','#ffd44a');pgAchCheck()}
   else if(!ens.includes(H.e)){H.e=null;H.ask=0}return}
  if(H.ask||state!='play'||p.dead||bossE||p.x<Math.min(900,lv.len*.08))return;let cs=pgWCand(300,1600);if(!cs.length&&++H.wt>600)cs=pgWCand(-900,1600);if(!cs.length)return;
  const e=cs[(Math.random()*cs.length)|0];e.bty=Wn.n;e.hp=Math.round(e.hp*2.4);e._wnt=1;H.e=e;H.ask=1}
@@ -113,16 +111,16 @@ boardUse=function(b){if(CT&&CT.e.st!='dead'&&!CT.done){say('Už máš zakázku: 
 {const _d=dPoster;dPoster=function(){try{pgWantedUpd()}catch(e){}return _d()}}
 function pgWantedUpd(){if(!CT||TR2||li<0||li>=WNT.length)return;const s=pgSV(),Wn=WNT[li];
  if(!CT._pg){CT._pg=1;CT.first=0;CT.rew=15;CT.tal=null}
- if(!CT.done&&CT.e&&CT.e.st=='dead'){CT.done=1;addSc(500);pgCoins(CT.rew,W/2,150);const fst=CT.first&&!s.w[li];if(fst){s.w[li]=1;s.tal[Wn.tal]=1;if(s.eq.length<pgSlots()&&!s.eq.includes(Wn.tal))s.eq.push(Wn.tal)}saveSV();PG.nw++;
-  if(fst)pgBan({k:'wnt',i:li,rew:CT.rew,tal:Wn.tal,n:Wn.n});else pgBan({k:'zak',i:li,q:-1,rew:CT.rew,n:CT.name});pop(p.x,LY,p.z+130,'DOPADEN! +'+CT.rew+' $','#ffd44a');pgAchCheck()}}
+ if(!CT.done&&CT.e&&CT.e.st=='dead'){CT.done=1;addSc(500);saveSV();PG.nw++;
+  pgBan({k:'zak',i:li,q:-1,n:CT.name});pop(p.x,LY,p.z+130,'DOPADEN!','#ffd44a');pgAchCheck()}}
 {const _q=qUpd;qUpd=function(){try{pgWantedUpd();pgWantedAuto()}catch(e){console.error('pgW',e)}return _q()}}
 
 /* ======================= HVĚZDNÁ CESTA ======================= */
-function pgRankCheck(){const s=pgSV(),r=pgRankIdx();while((s.rk|0)<r){s.rk=(s.rk|0)+1;const R=PGR[s.rk];if(R.c)pgCoins(R.c,W/2,160);if(R.tal){s.tal[R.tal]=1;if(s.eq.length<pgSlots()&&!s.eq.includes(R.tal))s.eq.push(R.tal)}if(R.tr)s.own[R.tr]=1;if(R.ti)s.own['ti:'+R.ti]=1;saveSV();PG.nw++;pgBan({k:'rank',r:s.rk})}}
+function pgRankCheck(){const s=pgSV(),r=pgRankIdx();while((s.rk|0)<r){s.rk=(s.rk|0)+1;const R=PGR[s.rk];if(R.tr)s.own[R.tr]=1;if(R.ti)s.own['ti:'+R.ti]=1;saveSV();PG.nw++;pgBan({k:'rank',r:s.rk})}}
 
 /* ======================= ÚSPĚCHY ======================= */
 function pgAchTier(id){return pgSV().a[id]|0}
-function pgAchCheck(){if(TR2)return;const s=pgSV();for(const A of ACH2){const v=A[3](),t0=s.a[A[0]]|0;let t=t0;while(t<3&&v>=A[4][t])t++;if(t>t0){for(let k=t0;k<t;k++){s.a[A[0]]=k+1;pgCoins(ACHR[k],W-200,90);if(k==2){s.own['ti:'+A[1]]=1;if(A[5])s.own[A[5]]=1}PG.nw++;pgBan({k:'ach',id:A[0],tier:k})}saveSV()}}}
+function pgAchCheck(){if(TR2)return;const s=pgSV();for(const A of ACH2){const v=A[3](),t0=s.a[A[0]]|0;let t=t0;while(t<3&&v>=A[4][t])t++;if(t>t0){for(let k=t0;k<t;k++){s.a[A[0]]=k+1;if(k==2){s.own['ti:'+A[1]]=1;if(A[5])s.own[A[5]]=1}PG.nw++;pgBan({k:'ach',id:A[0],tier:k})}saveSV()}}}
 function pgAchPts(){let n=0;for(const A of ACH2)n+=pgAchTier(A[0]);return n}
 achU=function(id){};/* staré úspěchy nahrazeny */
 achCheck=function(){pgAchCheck()};
@@ -178,12 +176,12 @@ function pgBanDraw(){const b=PG.ban[0];if(b&&!(state=='cut'||state=='cin'||state
   pgPlaque(w,h,b.k=='fail');const lx=-w/2+(big?60:42);let title='',sub='',rew='';
   if(b.k=='star'){const m=pgMask(b.i);for(let k=0;k<3;k++){const on=m>>k&1,isN=k==b.b,u=isN?Math.min(1,t/22):1,s2=isN&&t<30?1+(1-u)*1.4:1;pgStarShape(lx-30+k*30,4+(k==1?-8:0),(isN?16:13)*s2,on&&(!isN||t>6),isN?(1-u)*-3:0,isN?.6:0)}
    title='HVĚZDA ZÍSKÁNA!';sub=LV[b.i].n+' • '+PGSN[b.b]+(b.b==2?': '+qTxt(b.i,0):'')}
-  else if(b.k=='zak'){hbCoin(lx,0,20,T*.1);title='ZAKÁZKA SPLNĚNA';sub=b.q<0?'Dopaden: '+b.n:qTxt(b.i,b.q);rew='+'+b.rew}
+  else if(b.k=='zak'){X.save();X.translate(lx,0);X.fillStyle='#2a6a1a';X.beginPath();X.arc(0,0,22,0,7);X.fill();X.restore();qCheck(lx+1,-1,1.5,'#f4ffe8');title='ZAKÁZKA SPLNĚNA';sub=b.q<0?'Dopaden: '+b.n:qTxt(b.i,b.q)}
   else if(b.k=='fail'){X.save();X.translate(lx,0);X.fillStyle='#8a1a0a';X.beginPath();X.arc(0,0,22,0,7);X.fill();X.restore();qCross(lx,0,1.5,'#ffe8d8');title=b.q==0?'VÝZVA ZMAŘENA':'ZAKÁZKA ZMAŘENA';sub=qTxt(b.i,b.q)+' – zkus to příště'}
-  else if(b.k=='rank'){qSheriff(lx,0,30,Math.sin(T*.05)*.1);title='NOVÁ HODNOST!';const R=PGR[b.r];sub=R.n+' • '+pgRankRew(R)}
-  else if(b.k=='ach'){const A=ACH2.find(o=>o[0]==b.id);pgMedal(lx,6,20,b.tier);title='ÚSPĚCH – '+ACHT[b.tier];sub=A[1]+': '+A[2](A[4][b.tier]);rew='+'+ACHR[b.tier]}
+  else if(b.k=='rank'){qSheriff(lx,0,30,Math.sin(T*.05)*.1);title='NOVÁ HODNOST!';const R=PGR[b.r],rw=pgRankRew(R);sub=R.n+(rw?' • '+rw:'')}
+  else if(b.k=='ach'){const A=ACH2.find(o=>o[0]==b.id);pgMedal(lx,6,20,b.tier);title='ÚSPĚCH – '+ACHT[b.tier];sub=A[1]+': '+A[2](A[4][b.tier])}
   else if(b.k=='wnt'){X.save();X.translate(lx,0);X.rotate(-.08);X.fillStyle='#e8d4a4';X.fillRect(-24,-30,48,60);X.strokeStyle='#5a3a1a';X.lineWidth=2;X.strokeRect(-24,-30,48,60);X.fillStyle='#3a2210';X.font='700 9px Georgia';X.textAlign='center';X.fillText('SE HLEDÁ',0,-18);X.strokeStyle='#a8241a';X.lineWidth=2.4;X.strokeRect(-20,-6,40,16);X.fillStyle='#a8241a';X.font='700 9px Georgia';X.fillText('DOPADEN',0,6);X.restore();
-   title='HLEDANÝ DOPADEN!';sub=b.n+(b.tal?' • talisman „'+talById(b.tal).n+'“':'');rew='+'+b.rew}
+   title='HLEDANÝ DOPADEN!';sub=b.n}
   X.textAlign='left';const tx=-w/2+(big?120:80);X.font=(big?'26px ':'21px ')+FONT;X.fillStyle=b.k=='fail'?'#8a1a0a':'#7a2a06';X.fillText(title,tx,big?-12:-6);
   X.font='italic 14px Georgia';X.fillStyle='#3a2210';wrapL(sub,w-(tx+w/2)-(rew?(b.tal?140:90):b.k=='rank'?80:24)).slice(0,2).forEach((l,j)=>X.fillText(l,tx,(big?12:16)+j*17));
   if(rew){const rx=b.k=='wnt'&&b.tal?w/2-96:w/2-46;X.textAlign='right';X.font='26px '+FONT;X.lineWidth=5;X.lineJoin='round';X.strokeStyle='#3a1a06';X.strokeText(rew,rx,10);X.fillStyle='#ffd44a';X.fillText(rew,rx,10);hbCoin(rx+18,1,11,T*.1)}
@@ -191,7 +189,7 @@ function pgBanDraw(){const b=PG.ban[0];if(b&&!(state=='cut'||state=='cin'||state
   if(b.k=='rank'){const R=PGR[b.r];X.fillStyle='rgba(58,30,12,.85)';X.beginPath();X.arc(w/2-40,0,28,0,7);X.fill();pgRewIco(R,w/2-40,0,22)}
   X.restore()}}
  for(const f of PG.fly){if(f.t<0)continue;const u=Math.min(1,f.t/f.d),v=1-u,x=v*v*f.x+2*v*u*f.c1x+u*u*f.tx,y=v*v*f.y+2*v*u*f.c1y+u*u*f.ty;X.save();X.setTransform(1,0,0,1,0,0);X.globalAlpha=Math.min(1,(1-u)*3+.3);hbCoin(x,y,7+3*(1-u),f.t*.3);X.restore()}}
-function pgRankRew(R){const a=[];if(R.c)a.push('+'+R.c+' $');if(R.slot)a.push('nový slot na talisman');if(R.tal)a.push('talisman „'+talById(R.tal).n+'“');if(R.tr)a.push('stopa „'+PGTR[R.tr].n+'“');if(R.ti)a.push('titul');return a.join(', ')||R.d||''}
+function pgRankRew(R){const a=[];if(R.tr)a.push('stopa „'+PGTR[R.tr].n+'“');if(R.ti)a.push('titul');return a.join(', ')}
 function pgRewIco(R,x,y,r){if(R.tal)talIco(R.tal,x,y,r);else if(R.slot)rwSlotIco(x,y,r*1.2);else if(R.tr){pgTrailIco(R.tr,x,y,r)}else if(R.c)hbCoin(x,y,r*.75,T*.05);else qSheriff(x,y,r*.8,0)}
 function pgTrailIco(k,x,y,r){X.save();X.translate(x,y);const s=r/20;X.scale(s,s);if(k=='zadna'){X.strokeStyle='#8a7a6a';X.lineWidth=3;X.beginPath();X.arc(0,0,12,0,7);X.moveTo(-8,8);X.lineTo(8,-8);X.stroke()}
  else for(let i=0;i<7;i++){const a=i/7*6.283+T*.03,rr=6+((i*5)%9),px=Math.cos(a)*rr,py=Math.sin(a)*rr;const tt={k,l:i*4,L:40,a:a,s:1,c:['#ff7aa8','#ffd84a','#fff4f8','#ffd44a'][i%4]};pgTrailDraw(tt,px,py,.9)}X.restore()}
@@ -211,24 +209,21 @@ function pgAreaMini(i,x,y,w,lk){const m=pgMask(i),s=pgSV();X.save();X.textAlign=
  rows.forEach((r,k)=>{const yy=y+30+k*22;pgStarShape(x+9,yy-4,6.5,r[1]);X.font='12px Georgia';X.fillStyle=r[1]?'#4a6a2a':PGP.dark;wrapL(r[0],w-28).slice(0,1).forEach(l=>X.fillText(l,x+22,yy))});
  let y2=y+30+3*22+4;X.fillStyle='#7a5228';X.fillRect(x,y2-10,w,1.2);
  X.font='15px '+FONT;X.fillStyle=PGP.dark;X.fillText('ZAKÁZKY',x+2,y2+8);X.font='700 12px Georgia';X.fillStyle=PGP.mid;X.textAlign='right';X.fillText(qCount(i)+' / 3',x+w,y2+8);X.textAlign='left';
- for(let j=0;j<3;j++){const yy=y2+28+j*21,d=QD[i][j+1],done=pgZk(i,j);pgCk(x+8,yy-4,done);X.font='12px Georgia';X.fillStyle=done?'#4a6a2a':PGP.dark;X.fillText(wrapL(qTxt(i,j+1),w-74)[0],x+22,yy);
-  X.textAlign='right';X.font='700 12px Georgia';X.fillStyle=done?'#8a7a5a':'#8a4a0a';X.fillText('+'+d[2],x+w-16,yy);hbCoin(x+w-6,yy-4,5.5,0);X.textAlign='left'}
+ for(let j=0;j<3;j++){const yy=y2+28+j*21,d=QD[i][j+1],done=pgZk(i,j);pgCk(x+8,yy-4,done);X.font='12px Georgia';X.fillStyle=done?'#4a6a2a':PGP.dark;X.fillText(wrapL(qTxt(i,j+1),w-30)[0],x+22,yy)}
  let y3=y2+28+3*21+2;X.fillStyle='#7a5228';X.fillRect(x,y3-10,w,1.2);const wd=!!s.w[i],Wn=WNT[i];
  pgWantedIco(x+12,y3+12,.9,wd);X.font='700 11px Georgia';X.fillStyle='#8a4a1a';X.fillText('HLEDANÝ',x+30,y3+6);X.font='12.5px Georgia';X.fillStyle=PGP.dark;X.fillText(wd&&!lk?Wn.n:'???',x+30,y3+21);
- X.fillStyle='rgba(58,30,12,'+(wd?.85:.35)+')';X.beginPath();X.arc(x+w-14,y3+12,13,0,7);X.fill();talIco(Wn.tal,x+w-14,y3+12,10.5,!wd);
- X.textAlign='right';X.font='italic 11px Georgia';X.fillStyle=wd?'#2a7a2a':'#7a5a3a';X.fillText(wd?'dopaden':'totožnost neznámá',x+w-32,y3+21);X.restore();return y3+34}
+ X.textAlign='right';X.font='italic 11px Georgia';X.fillStyle=wd?'#2a7a2a':'#7a5a3a';X.fillText(wd?'dopaden':'totožnost neznámá',x+w-4,y3+21);X.restore();return y3+34}
 /* ---------- panel ve hře (vlevo nahoře) ---------- */
 qHud=function(){const q=LS&&LS.q;if(!q||!p||TR2)return;const i=q.i,U=QS.ui,m=pgMask(i);const tgt=(U.exp>0||U.pin)?1:0;U.ek=(U.ek||0)+(tgt-(U.ek||0))*.16;const e=U.ek;
  U.my=(U.my||0)+((msgT>0&&!(bI>0)?30:0)-(U.my||0))*.2;const HBo=typeof HB!='undefined'&&HB.on,x=14,yb=(HBo?62:94)+(p.w&&!HBo?32:0)+(p.hid?30:0)+U.my,rh=22,w=Math.round(176+e*140),h=Math.round(28+e*(5*rh+12));
  X.save();X.fillStyle='rgba(22,10,6,'+(.62+.2*e)+')';rr(x,yb,w,h,8);X.strokeStyle='rgba(232,184,96,'+(.45+.3*e)+')';X.lineWidth=1.4;X.beginPath();X.roundRect(x+.5,yb+.5,w-1,h-1,8);X.stroke();
  for(let k=0;k<3;k++){const on=m>>k&1;pgStarShape(x+16+k*20,yb+14,8,on,0,on&&(U.fl[0]>0&&k==2)?.5:0)}
  X.textAlign='left';X.font='13px '+FONT;X.fillStyle='#ffd27a';X.fillText(LV[i].n.toUpperCase().slice(0,16),x+76,yb+19);
- pgSV().eq.forEach((id,k)=>{const tx=x+w+16+k*24,ty=yb+14;X.fillStyle='rgba(22,10,6,.7)';X.beginPath();X.arc(tx,ty,11,0,7);X.fill();X.strokeStyle='rgba(232,184,96,.5)';X.lineWidth=1;X.stroke();talIco(id,tx,ty,8.5)});
  if(e>.5){X.globalAlpha=(e-.5)*2;X.textAlign='right';X.font='11px Georgia';X.fillStyle='rgba(255,230,190,.55)';X.fillText(U.pin?'[U] skrýt':'[U] připnout',x+w-8,yb+18);X.globalAlpha=1}
  if(e>.04){X.save();X.beginPath();X.rect(x,yb+26,w,h-26);X.clip();X.globalAlpha=Math.min(1,e*1.5);
   const line=(k,yy)=>{const d=QD[i][k],st=qState(k),done=st=='done'||st=='ever',fail=false,fl=U.fl[k]||0,sh=(U.sh[k]||0)>0?Math.sin(U.sh[k]*1.3)*3:0;
    if(fl>0){X.fillStyle='rgba(255,200,90,'+(Math.min(1,fl/40)*.4)+')';X.beginPath();X.roundRect(x+4,yy-rh/2+1,w-8,rh-2,5);X.fill()}
-   if(k==0)pgStarShape(x+16+sh,yy,7,done);else{hbCoin(x+16+sh,yy,6.5,0);if(done){X.fillStyle='rgba(20,60,10,.5)';X.beginPath();X.arc(x+16,yy,7,0,7);X.fill()}}
+   if(k==0)pgStarShape(x+16+sh,yy,7,done);else{X.fillStyle=done?'rgba(60,130,40,.9)':'rgba(140,100,60,.45)';X.beginPath();X.arc(x+16+sh,yy,6.5,0,7);X.fill();if(!done){X.fillStyle='#f4e2bc';X.font='700 9px Georgia';X.textAlign='center';X.fillText('?',x+16+sh,yy+3.2)}}
    X.font='12.5px Georgia';X.textAlign='left';X.fillStyle=done?'rgba(190,230,160,.85)':fail?'rgba(230,150,130,.6)':'#f4e2bc';const tx=k==0?'Výzva: '+qShort(i,0):qShort(i,k);X.fillText(tx,x+30+sh,yy+4);
    if(done||fail){const tw=X.measureText(tx).width;X.fillStyle=done?'rgba(160,220,140,.55)':'rgba(255,110,90,.6)';X.fillRect(x+30+sh,yy,tw,1.3)}
    if(done)qCheck(x+w-16,yy,.75)};
@@ -240,10 +235,10 @@ qHud=function(){const q=LS&&LS.q;if(!q||!p||TR2)return;const i=q.i,U=QS.ui,m=pgM
 {const _dp=dPause;dPause=function(){_dp();try{if(!LS||!LS.q||TR2)return;const i=LS.q.i,x=W-292,y=96,w=276,h=392;qPaper(x,y,w,h,i*3+1);
  X.textAlign='left';X.font='17px '+FONT;X.fillStyle='#3a1606';X.fillText(LV[i].n.toUpperCase(),x+16,y+28);X.fillStyle='#7a5228';X.fillRect(x+14,y+36,w-28,1.5);
  const yy=pgAreaMini(i,x+14,y+52,w-28,0);X.textAlign='center';X.font='italic 11.5px Georgia';X.fillStyle='#6a4a2a';X.fillText('Hvězdy celkem: '+pgStars()+' / 24  •  hodnost '+PGR[pgRankIdx()].n,x+w/2,Math.min(y+h-12,yy+18))}catch(e){console.error(e)}}}
-{const _md=m3CardData;m3CardData=function(it){if(it!='Deník')return _md(it);const D={t:'Deník',s:'Hodnost: '+PGR[pgRankIdx()].n,b:PG.nw?'Máš '+PG.nw+' '+qPl(PG.nw,'novinku','novinky','novinek')+' – podívej se!':'Hvězdy oblastí, zakázky, hledaní, úspěchy, talismany a vzhled.',eh:46,ex:null};
+{const _md=m3CardData;m3CardData=function(it){if(it!='Deník')return _md(it);const D={t:'Deník',s:'Hodnost: '+PGR[pgRankIdx()].n,b:PG.nw?'Máš '+PG.nw+' '+qPl(PG.nw,'novinku','novinky','novinek')+' – podívej se!':'Hvězdy oblastí, zakázky, hledaní, úspěchy a vzhled.',eh:46,ex:null};
  D.ex=(x,y,w)=>{const n=pgStars(),R=PGR[pgRankIdx()],N=PGR[Math.min(PGR.length-1,pgRankIdx()+1)];X.font='13px Georgia';X.fillStyle='#5a3a1a';X.fillText('Hvězdy '+n+' / 24',x,y+12);X.fillStyle='rgba(60,30,10,.2)';X.fillRect(x,y+18,w,6);X.fillStyle='#e8a020';X.fillRect(x,y+18,w*n/24,6);
-  X.fillStyle='#5a3a1a';X.fillText('Talismany:',x,y+42);const eq=pgSV().eq;eq.forEach((id,k)=>{X.fillStyle='rgba(58,30,12,.85)';X.beginPath();X.arc(x+84+k*26,y+37,11,0,7);X.fill();talIco(id,x+84+k*26,y+37,9)});if(!eq.length){X.font='italic 12px Georgia';X.fillStyle='#7a5a3a';X.fillText('žádný nasazený',x+72,y+42)}};return D}}
-MDESC['Deník']='Hvězdy oblastí, zakázky, hledaní bandité, úspěchy, talismany a vzhled postavy.';
+};return D}}
+MDESC['Deník']='Hvězdy oblastí, zakázky, hledaní bandité, úspěchy a vzhled postavy.';
 
 /* =====================================================================
    VÝSLEDKY OBLASTI
@@ -267,8 +262,8 @@ dRes=function(){if(!RES)return;const R=RES,t=R.t,i=R.qi!=null?R.qi:li,q=R.q,m0=R
  if(t>40){const k=Math.min(1,(t-40)/12),z=1+(1-k)*2;X.save();X.translate(x0+380,y0+330);X.scale(z,z);X.rotate(-.12);X.globalAlpha=k*k0;X.strokeStyle=RKC[R.rk];X.lineWidth=4;X.beginPath();X.arc(0,0,40,0,7);X.stroke();X.font='48px '+FONT;X.textAlign='center';X.fillStyle=RKC[R.rk];X.fillText(R.rk,0,17);X.restore();
   if(R.nb){X.textAlign='center';X.font='700 13px Georgia';X.fillStyle=T%30<15?'#ffd44a':'#fff';X.fillText('NOVÝ REKORD!',x0+380,y0+396)}}
  /* odměny */const rx=x0+500,ry=y0+262,ra=m3Ease((t-PGRS.st-20)/16);if(ra>0){X.save();X.globalAlpha=ra*k0;X.fillStyle='rgba(255,230,180,.06)';X.beginPath();X.roundRect(rx,ry-18,360,214,10);X.fill();X.strokeStyle='rgba(201,169,90,.4)';X.stroke();
-  X.textAlign='left';X.font='16px '+FONT;X.fillStyle='#ffd27a';X.fillText('ODMĚNY Z VÝPRAVY',rx+14,ry+4);const cc=Math.round((R.coins|0)*Math.min(1,(t-PGRS.st-20)/40));hbCoin(rx+26,ry+34,11,T*.08);X.font='26px '+FONT;X.fillStyle='#ffd44a';X.fillText('+'+cc,rx+44,ry+44);X.font='italic 13px Georgia';X.fillStyle='#e9d3a4';X.fillText('zlaťáků celkem • máš '+SV.st,rx+44+X.measureText('+'+cc).width*2.1,ry+42);
-  let yy=ry+74;X.font='13px Georgia';for(let k=1;k<4;k++){const d=QD[i][k],nw=q&&(q.nw>>k&1),ev=pgZk(i,k-1);pgCk(rx+20,yy-4,ev);X.fillStyle=nw?'#9fe09a':ev?'rgba(190,230,160,.7)':'#e9d3a4';X.fillText(wrapL(qTxt(i,k),250)[0],rx+34,yy);X.textAlign='right';X.fillStyle=nw?'#ffd44a':'rgba(233,211,164,.5)';X.fillText(nw?'+'+d[2]+' $':ev?'splněno':'',rx+346,yy);X.textAlign='left';yy+=22}
+  X.textAlign='left';X.font='16px '+FONT;X.fillStyle='#ffd27a';X.fillText('ZAKÁZKY A HLEDANÝ',rx+14,ry+4);
+  let yy=ry+40;X.font='13px Georgia';for(let k=1;k<4;k++){const d=QD[i][k],nw=q&&(q.nw>>k&1),ev=pgZk(i,k-1);pgCk(rx+20,yy-4,ev);X.fillStyle=nw?'#9fe09a':ev?'rgba(190,230,160,.7)':'#e9d3a4';X.fillText(wrapL(qTxt(i,k),250)[0],rx+34,yy);X.textAlign='right';X.fillStyle=nw?'#ffd44a':'rgba(233,211,164,.5)';X.fillText(nw?'nově splněno!':ev?'splněno':'',rx+346,yy);X.textAlign='left';yy+=22}
   const wd=!!pgSV().w[i];pgWantedIco(rx+20,yy+10,.8,wd);X.fillStyle=wd?'#9fe09a':'#e9d3a4';X.fillText('Hledaný: '+(wd?WNT[i].n+' – dopaden':'???'),rx+36,yy+14);
   X.font='italic 12px Georgia';X.fillStyle='rgba(233,211,164,.75)';X.fillText('Hvězdy celkem '+pgStars()+' / 24  •  hodnost '+PGR[pgRankIdx()].n,rx+14,ry+186);X.restore()}
  if(t>50){X.textAlign='center';X.font='14px Georgia';X.fillStyle='rgba(230,220,200,.75)';X.fillText(t<pgResT()?'Enter – přeskočit':'Enter – pokračovat',x0+w/2,y0+h-20)}
@@ -340,7 +335,7 @@ dQM=function(){PGD.hits=[];qmBg();const hv=pgHit(14,10,118,36,'back',0);m2Plank(
 function pgTabAreas(){for(let i=0;i<LV.length;i++){const y=104+i*50,lk=i>SV.un,sel=QM.reg==i,hv=pgHit(18,y,246,44,'reg',i),m=pgMask(i);X.save();X.fillStyle=sel?'rgba(255,214,140,.22)':hv?'rgba(255,214,140,.12)':'rgba(20,8,4,.45)';X.beginPath();X.roundRect(18,y,246,44,8);X.fill();X.strokeStyle=sel?'#ffcf7a':'rgba(232,184,96,.35)';X.lineWidth=sel?2:1;X.stroke();
   X.fillStyle=MPCOL[i]||'#5a4a3a';X.beginPath();X.arc(40,y+22,13,0,7);X.fill();X.strokeStyle='#1a0a04';X.lineWidth=1.5;X.stroke();X.fillStyle='#fff3dc';X.font='700 12px Georgia';X.textAlign='center';X.fillText(String(i+1),40,y+26);
   X.textAlign='left';X.font='15px '+FONT;X.fillStyle=lk?'rgba(240,220,190,.4)':'#f4e2bc';X.fillText(lk?'???':LV[i].n,62,y+20);for(let k=0;k<3;k++)pgStarShape(70+k*17,y+33,6,m>>k&1);
-  X.font='700 11px Georgia';X.fillStyle='rgba(255,230,190,.6)';X.textAlign='right';X.fillText(qCount(i)+'/3 $',256,y+37);if(pgSV().w[i]){pgWantedIco(244,y+17,.55,1)}X.restore()}
+  X.font='700 11px Georgia';X.fillStyle='rgba(255,230,190,.6)';X.textAlign='right';X.fillText(qCount(i)+'/3',256,y+37);if(pgSV().w[i]){pgWantedIco(244,y+17,.55,1)}X.restore()}
  const i=QM.reg,lk=i>SV.un,x=280,y=100,w=660,h=410;qPaper(x,y,w,h,i*11+3);X.save();X.textAlign='left';
  X.font='700 11px Georgia';X.fillStyle='#8a4a1a';X.fillText('KAPITOLA '+(i+1)+' / '+LV.length,x+20,y+24);X.font='26px '+FONT;X.fillStyle='#2a1206';X.fillText(lk?'Neprozkoumáno':LV[i].n,x+20,y+52);
  const b=SV.best&&SV.best[i];X.textAlign='right';X.font='12px Georgia';X.fillStyle='#5a3a1a';X.fillText(b?'Rekord '+b.sc+'  •  čas '+qMMSS(b.t):'zatím nedokončeno',x+w-20,y+26);if(b){X.font='26px '+FONT;X.fillStyle=RKC[b.r];X.fillText(b.r,x+w-20,y+54)}
@@ -351,10 +346,10 @@ function pgTabAreas(){for(let i=0;i<LV.length;i++){const y=104+i*50,lk=i>SV.un,s
   if(k==1){for(let s=0;s<3;s++)seedShape(cx+18+s*20,cy+80,.42,seedMask(i)>>s&1)}else if(k==2&&!on){const bb=qCountable(QD[i][0])?qBest(i,0):0;X.font='italic 11px Georgia';X.fillStyle='#7a5a3a';X.fillText(on?'splněno':'zatím nesplněno',cx+14,cy+86)}else{X.font='italic 11px Georgia';X.fillStyle=on?'#2a7a2a':'#7a5a3a';X.fillText(on?'získáno':'zatím ne',cx+14,cy+86)}}
  /* zakázky */let zy=y+200;X.font='18px '+FONT;X.fillStyle='#2a1206';X.fillText('ZAKÁZKY',x+20,zy);X.font='italic 12px Georgia';X.fillStyle='#7a5a3a';X.fillText('skryté – odhalí se, až je splníš',x+120,zy);
  for(let j=0;j<3;j++){const yy=zy+26+j*34,d=QD[i][j+1],done=pgZk(i,j),K=QK[d[0]];X.fillStyle='rgba(122,82,40,.25)';X.fillRect(x+20,yy+14,390,1);if(done)qIco(K.c,x+34,yy,11,false);else{X.fillStyle='rgba(90,58,26,.35)';X.beginPath();X.arc(x+34,yy,11,0,7);X.fill();X.textAlign='center';X.font='700 13px Georgia';X.fillStyle='#f4e2bc';X.fillText('?',x+34,yy+5);X.textAlign='left'}X.font='13px Georgia';X.fillStyle=done?'#4a6a2a':'#2a1406';X.fillText(qTxt(i,j+1),x+54,yy+5);
-  X.textAlign='right';if(done)qCheck(x+400,yy,1,'#2a8a2a');else{X.font='700 13px Georgia';X.fillStyle='#8a4a0a';X.fillText('+'+d[2],x+384,yy+5);hbCoin(x+398,yy,7,0)}X.textAlign='left'}
+  X.textAlign='right';if(done)qCheck(x+400,yy,1,'#2a8a2a');X.textAlign='left'}
  /* hledaný */const wx=x+440,wy=y+186,ww=200,wh=208,wd=!!pgSV().w[i],Wn=WNT[i];X.save();X.translate(wx+ww/2,wy+wh/2);X.rotate(.02);X.fillStyle='#e8d4a4';X.fillRect(-ww/2,-wh/2,ww,wh);X.strokeStyle='#6a4a22';X.lineWidth=2;X.strokeRect(-ww/2,-wh/2,ww,wh);
-  X.textAlign='center';X.fillStyle='#3a2210';X.font='700 22px Georgia';X.fillText('SE HLEDÁ',0,-wh/2+28);X.font='700 13px Georgia';X.fillText(wd&&!lk?Wn.n:'???',0,-wh/2+50);X.fillStyle='rgba(58,30,12,.85)';X.beginPath();X.arc(0,-6,34,0,7);X.fill();talIco(Wn.tal,0,-6,28,!wd);
-  X.font='italic 12px Georgia';X.fillStyle='#5a3a1a';X.fillText('Odměna: talisman',0,44);X.fillText('„'+talById(Wn.tal).n+'“ + 60 $',0,60);X.font='italic 10.5px Georgia';X.fillStyle='#7a5a3a';if(!wd)X.fillText('totožnost neznámá',0,82);
+  X.textAlign='center';X.fillStyle='#3a2210';X.font='700 22px Georgia';X.fillText('SE HLEDÁ',0,-wh/2+28);X.font='700 13px Georgia';X.fillText(wd&&!lk?Wn.n:'???',0,-wh/2+50);X.fillStyle='rgba(58,30,12,.85)';X.beginPath();X.arc(0,-2,36,0,7);X.fill();X.fillStyle='#d8c494';X.beginPath();X.arc(0,-12,12,0,7);X.fill();X.beginPath();X.ellipse(0,16,20,13,0,Math.PI,0);X.fill();X.fillStyle='#3a2210';X.fillRect(-17,-24,34,5);X.fillRect(-10,-33,20,10);
+  X.font='italic 12px Georgia';X.fillStyle='#5a3a1a';X.fillText(wd?'dopaden – spravedlnosti učiněno zadost':'mrtvý nebo živý',0,56);X.font='italic 10.5px Georgia';X.fillStyle='#7a5a3a';if(!wd)X.fillText('totožnost neznámá',0,80);
   if(wd){X.save();X.rotate(-.25);X.strokeStyle='#a8241a';X.lineWidth=4;X.strokeRect(-76,-22,152,44);X.font='30px '+FONT;X.fillStyle='#a8241a';X.fillText('DOPADEN',0,11);X.restore()}X.restore();
  if(lk){X.fillStyle='rgba(60,44,30,.55)';X.fillRect(x+6,y+70,w-12,h-80);X.textAlign='center';X.font='22px '+FONT;X.fillStyle='#f4e2bc';X.fillText('ZAMČENO – dokonči předchozí oblast',x+w/2,y+h/2+20)}
  X.restore()}
@@ -364,14 +359,14 @@ function pgTabRoad(){const st=pgStars(),ri=pgRankIdx(),R=PGR[ri],N=PGR[ri+1];
  qSheriff(86,160,44,Math.sin(T*.02)*.05);X.textAlign='left';X.font='700 12px Georgia';X.fillStyle='#e8c070';X.fillText('TVOJE HODNOST',150,136);X.font='34px '+FONT;X.fillStyle='#ffe6a0';X.fillText(R.n,150,172);
  X.font='14px Georgia';X.fillStyle='#e9d3a4';X.fillText(N?'Další: '+N.n+' za '+N.s+' ★ (chybí '+(N.s-st)+')':'Nejvyšší hodnost! Poušť ti patří.',150,198);
  const bx=560,bw=350;X.fillStyle='rgba(0,0,0,.4)';X.beginPath();X.roundRect(bx,150,bw,14,7);X.fill();const f=N?(st-R.s)/(N.s-R.s):1;X.fillStyle='#e8a020';X.beginPath();X.roundRect(bx,150,bw*Math.max(.02,f),14,7);X.fill();pgStarShape(bx-16,157,10,1);X.font='700 14px Georgia';X.fillStyle='#ffe6a0';X.textAlign='right';X.fillText(st+' / 24 hvězd',bx+bw,140);
- X.textAlign='left';X.font='12px Georgia';X.fillStyle='rgba(233,211,164,.8)';X.fillText('Sloty na talismany: '+pgSlots()+' / 4',bx,188);
+ 
  /* cesta */const x0=70,x1=900,yy=350,px=s=>x0+(x1-x0)*s/24;X.lineCap='round';X.strokeStyle='rgba(20,8,4,.6)';X.lineWidth=14;X.beginPath();X.moveTo(x0,yy);X.lineTo(x1,yy);X.stroke();X.strokeStyle='#8a5a2a';X.lineWidth=8;X.stroke();X.strokeStyle='#ffd44a';X.lineWidth=8;X.beginPath();X.moveTo(x0,yy);X.lineTo(px(st),yy);X.stroke();
  for(let s=1;s<24;s++){X.fillStyle=s<=st?'#ffe6a0':'rgba(40,20,8,.7)';X.beginPath();X.arc(px(s),yy,2.2,0,7);X.fill()}
  PGR.forEach((Rk,k)=>{const x=px(Rk.s),got=st>=Rk.s,up=k%2==0;X.save();qSheriff(x,yy,got?16:13,0,!got);X.textAlign='center';X.font='700 11px Georgia';X.fillStyle=got?'#ffe6a0':'rgba(233,211,164,.55)';X.fillText(Rk.s+' ★',x,yy+(up?34:-28));
   X.font='12px '+FONT;X.fillStyle=got?'#f4e2bc':'rgba(233,211,164,.5)';const nm=Rk.n.split(' ');nm.forEach((w2,j)=>X.fillText(w2,x,yy+(up?50+j*13:-54-(nm.length-1-j)*13)));
   if(k>0){const ry=up?yy+92+13*(nm.length-1):yy-104-13*(nm.length-1);X.fillStyle=got?'rgba(58,30,12,.9)':'rgba(58,30,12,.5)';X.beginPath();X.arc(x,ry,16,0,7);X.fill();X.strokeStyle=got?'#ffd44a':'rgba(232,184,96,.3)';X.lineWidth=1.5;X.stroke();X.globalAlpha=got?1:.45;pgRewIco(Rk,x,ry,13);X.globalAlpha=1}X.restore()});
  /* žeton hrdiny */const hx=px(st);X.save();X.translate(hx,yy-30+Math.sin(T*.08)*2);X.fillStyle='#2a1406';X.beginPath();X.moveTo(0,10);X.lineTo(-7,0);X.lineTo(7,0);X.closePath();X.fill();X.fillStyle='#3a8a3a';X.beginPath();X.arc(0,-6,9,0,7);X.fill();X.strokeStyle='#1a3a10';X.lineWidth=2;X.stroke();X.restore();
- X.textAlign='center';X.font='italic 13px Georgia';X.fillStyle='rgba(233,211,164,.8)';X.fillText('Každá oblast dává až 3 hvězdy: dokončení, všechna semínka a výzvu. Odměny hodností se připíšou samy.',W/2,500);X.restore()}
+ X.textAlign='center';X.font='italic 13px Georgia';X.fillStyle='rgba(233,211,164,.8)';X.fillText('Každá oblast dává až 3 hvězdy: dokončení, všechna semínka a výzvu.',W/2,500);X.restore()}
 /* ---------- ÚSPĚCHY ---------- */
 function pgTabAch(){let b=0,s=0,g=0;ACH2.forEach(A=>{const t=pgAchTier(A[0]);if(t>=1)b++;if(t>=2)s++;if(t>=3)g++});X.save();X.textAlign='left';X.font='13px Georgia';X.fillStyle='#e9d3a4';X.fillText('Medaile: '+pgAchPts()+' / '+ACH2.length*3,28,116);[[b,0],[s,1],[g,2]].forEach(([n,k],j)=>{pgMedal(190+j*70,111,8,k);X.fillStyle='#e9d3a4';X.fillText(String(n),202+j*70,116)});
  X.textAlign='right';X.fillText('Za medaile: bronz +25 $, stříbro +60 $, zlato +150 $ a titul',W-28,116);

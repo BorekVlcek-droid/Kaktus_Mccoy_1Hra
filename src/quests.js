@@ -30,9 +30,9 @@ const QK={
  rank:{c:'mistr',t:n=>'Získej hodnocení A nebo S',s:n=>'Hodnocení A/S',end:1,flag:1}};
 /* [typ, cíl, odměna ★] */
 const QD=[
- [['kills',8,5],['stealth',2,10],['coins',50,5],['seeds',3,10],['bossnohit',3,15]],
- [['kills',15,5],['combo',10,10],['coins',12,5],['seeds',3,10],['bossnohit',4,15]],
- [['stealth',3,10],['air',2,10],['coins',55,5],['seeds',3,10],['time',300,15]],
+ [['kills',8,5],['stealth',2,10],['combo',8,5],['seeds',3,10],['bossnohit',3,15]],
+ [['kills',15,5],['combo',10,10],['air',3,5],['seeds',3,10],['bossnohit',4,15]],
+ [['stealth',3,10],['air',2,10],['kills',12,5],['seeds',3,10],['time',300,15]],
  [['boom',2,10],['throw',1,10],['kills',9,5],['seeds',3,10],['bossnohit',3,15]],
  [['wpn',3,10],['surr',1,10],['combo',15,10],['seeds',3,10],['time',330,15]],
  [['noalarm',1,15],['free',1,5],['stealth',4,10],['seeds',3,10],['bossnohit',3,15]],
