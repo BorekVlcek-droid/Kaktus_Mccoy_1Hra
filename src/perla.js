@@ -469,3 +469,6 @@ function enMute(){return !cut&&state!='cut'&&state!='cin'}
 const ENSH=new Set(['Harr!','Hehehe!','Z kabiny!']);
 {const _p=pop;pop=function(x,y,z,t,c){if(typeof t=='string'&&enMute()&&(/^…?¡/.test(t)||ENSH.has(t)))return;return _p.apply(this,arguments)}}
 LHK.push(()=>{if(enMute()&&EBUB.length)EBUB=EBUB.filter(b=>b.civ||(b.e&&b.e.civ))});
+
+/* v97: mrtvá těla enemigos po chvíli zmizí (krátce zůstanou, aby si jich mohli všimnout parťáci, pak se rozplynou) */
+{const _f=fxE;fxE=function(e){if(e&&e.st=='dead'&&!isB(e)&&e!==bossE&&e.dt>110){const a=Math.max(0,(160-e.dt)/50);if(a<=0)return;X.save();X.globalAlpha*=a;try{return _f(e)}finally{X.restore()}}return _f(e)}}

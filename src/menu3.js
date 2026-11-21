@@ -179,7 +179,6 @@ function m3Bar(t){const k=m3Ease((t-30)/20);if(k<=0)return;X.save();X.translate(
  let x=22;const chip=(draw,txt,col)=>{X.font='700 14px Georgia';const tw=X.measureText(txt).width;X.fillStyle='rgba(255,220,160,.08)';X.beginPath();X.roundRect(x-6,y+6,tw+36,19,9);X.fill();draw(x+8,y+15.5);X.fillStyle=col;X.textAlign='left';X.fillText(txt,x+22,y+20.5);x+=tw+48};
  chip((cx,cy)=>m3Star(cx,cy,8,'#ffd44a'),pgStars()+'/24','#ffe6a0');
  chip((cx,cy)=>{X.fillStyle='#e8b040';X.beginPath();X.moveTo(cx-6,cy-6);X.lineTo(cx+6,cy-6);X.lineTo(cx+4,cy+1);X.lineTo(cx-4,cy+1);X.closePath();X.fill();X.fillRect(cx-1.2,cy+1,2.4,4);X.fillRect(cx-4,cy+5,8,2)},pgAchPts()+'/'+ACH2.length*3,'#ffe6a0');
- chip((cx,cy)=>{try{seedShape(cx,cy+1,.42,1)}catch(e){}},seedTotal()+'/'+SEEDP_N(),'#a8ffb0');
  X.textAlign='right';X.font='13px Georgia';X.fillStyle='rgba(255,236,200,.62)';X.fillText(TOUCH?'Klepni na ceduli':(mn.sub==3?'':'↑↓ výběr  •  Enter potvrdit  •  myš i gamepad'),W-20,y+20);X.textAlign='left';X.restore()}
 /* ---------- hlavní vykreslení ---------- */
 function m3Step(){M3.t++;const n=MI().length;
